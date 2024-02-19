@@ -1,7 +1,7 @@
 from fastapi import FastAPI
-from app.config.db import Base, engine
-from app.pensar.controllers.controllers import router_pensar
-import app.pensar.models.models as pen
+from config.db import Base, engine
+from pensar.controllers.controllers import router_pensar
+import pensar.models.models as pen
 
 app = FastAPI()
 

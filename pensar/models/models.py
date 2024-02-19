@@ -1,8 +1,8 @@
-from sqlalchemy import  Column, Integer, String #, ForeignKey, Float
-from app.config.db import Base
+from sqlalchemy import  Column, Integer, String, Float
+from config.db import Base
 
-class pensar(Base):
-    __tablename__ ="pensar"
+class componentes_model(Base):
+    __tablename__ ="componentes"
 
     ID             = Column(Integer, primary_key=True)
     IDplantel      = Column(Integer)
@@ -17,3 +17,21 @@ class pensar(Base):
     ciclo_anterior_plantel  = Column(Integer)
     ciclo_actual_nacional   = Column(Integer)
     ciclo_anterior_nacional = Column(Integer)
+
+class competencias_model(Base):
+    __tablename__ ="competencias"
+    #_table_args__ ={'schema': 'BD_MARTESDEPRUEBA.dbo'}
+
+    ID           = Column(Integer, primary_key= True)
+    IDplantel    = Column(Integer)
+    año          = Column(Integer)
+    departamento = Column(String(255))
+    ciudad       = Column(String(255))
+    competencia  = Column(String(255))
+    componente   = Column(String(255))
+    area                  = Column(String(255))
+    materia               = Column(String(255))
+    nombrePrueba          = Column(String(255))
+    grado                 = Column(Integer)
+    pregunta_Estado       = Column(String(255))
+    porcentaje_de_acierto = Column(Float)
