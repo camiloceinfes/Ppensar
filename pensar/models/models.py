@@ -38,8 +38,7 @@ class competencias_model(Base):
     
 class Pensar(Base):
     __tablename__ ="pensar"
-    #_table_args__ ={'schema': 'BD_MARTESDEPRUEBA.dbo'}
-
+    
     ID           = Column(Integer, primary_key= True)
     IDplantel    = Column(Integer)
     nombre_plantel = Column(String(255))

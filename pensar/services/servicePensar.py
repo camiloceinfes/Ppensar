@@ -1,18 +1,5 @@
-#from app.producto import producto
-# from product_creator import Ppensar_Creator
 
-# class pensar():
-
-#     def componentes(self, grado, salon, area, comp, db):
-#         return Ppensar_Creator().create_product(grado, salon, area, comp, db)
-    
-#     def competencias(self, idColegio, db):
-#         return Ppensar_Creator().create_product(idColegio, db)
-    
-#     def area(self, idColegio, anio, idPrueba, db):
-#         return Ppensar_Creator().create_product(idColegio, anio, idPrueba, db)
-
-from pensar.models.models import componentes_model, competencias_model
+from pensar.models.models import componentes_model, competencias_model, Pensar
 from sqlalchemy.orm import Session
 from sqlalchemy import or_, and_
 from functools import reduce
@@ -21,9 +8,26 @@ import pandas as pd
 import json
 
 class Ppensar():
-    
+    def get_tests(self, code, current_year, state, db):
+        print('Entro aqui')
+        pensar = db.query(Pensar).filter(Pensar.año_ciclo == current_year).all()
+        if not pensar:
+            return { 
+                "status_code": "404",
+                "message": "Resource not found" 
+            }
+        return pensar
+
+    def get_tasks(self, grado, salon, area, db):
+        return ''
+
+    def global_results(self, db):
+        return ''
+
+    def cycle_results(self, db):
+        return ''
+
     def calculate_componentes(self, grado, salon, area, comp, db):
-        
         lista = []
         lista_filtro = []
         lista_filtro.append(componentes_model.grado == grado)
@@ -73,7 +77,6 @@ class Ppensar():
         return lista
     
     def calculate_competencias(self, idColegio: int, db: Session):
-
         df = pl.read_database(db.query(competencias_model).filter(competencias_model.IDplantel == idColegio).statement, db.bind)
         df = df.with_columns(
             pl.when((pl.col("grado") == 1) | (pl.col("grado") == 2) | (pl.col("grado") == 3))
