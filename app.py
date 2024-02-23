@@ -15,4 +15,4 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-app.include_router(router_pensar, prefix="/Pruebapensar", tags=["componente"])
+app.include_router(router_pensar, prefix="/api/pensar", tags=["Pensar"])
