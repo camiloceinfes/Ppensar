@@ -40,7 +40,6 @@ async def component(db: Session = Depends(get_db)):
     return cycle_results
 
 @router_pensar.get("/components")
-@router_pensar.get("/componente")
 async def component(grado: int, salon: str = None, area: str = None, comp: str = None, db: Session = Depends(get_db)):
     pensar = Ppensar().calculate_componentes(grado, salon, area, comp, db)
     return pensar

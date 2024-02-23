@@ -9,7 +9,6 @@ import json
 
 class Ppensar():
     def get_tests(self, code, current_year, state, db):
-        print('Entro aqui')
         pensar = db.query(Pensar).filter(Pensar.año_ciclo == current_year).all()
         if not pensar:
             return { 
