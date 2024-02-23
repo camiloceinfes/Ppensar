@@ -1,0 +1,200 @@
+[
+    {
+        "ID": 1,
+        "IDplantel": 6340,
+        "anio": "2023",
+        "grado": 9,
+        "area": "area1",
+        "regilla": "tiene",
+        "grado_actual": 66,
+        "ciclo_anterior": 59,
+        "idPrueba": 4
+    },
+    {
+        "ID": 2,
+        "IDplantel": 6341,
+        "anio": "2023",
+        "grado": 9,
+        "area": "area2",
+        "regilla": "no tiene",
+        "grado_actual": 63,
+        "ciclo_anterior": 61,
+        "idPrueba": 3
+    },
+    {
+        "ID": 3,
+        "IDplantel": 6340,
+        "anio": "2023",
+        "grado": 9,
+        "area": "area3",
+        "regilla": "tiene",
+        "grado_actual": 61,
+        "ciclo_anterior": 59,
+        "idPrueba": 1
+    },
+    {
+        "ID": 4,
+        "IDplantel": 6340,
+        "anio": "2023",
+        "grado": 9,
+        "area": "area4",
+        "regilla": "no tiene",
+        "grado_actual": 58,
+        "ciclo_anterior": 53,
+        "idPrueba": 4
+    },
+    {
+        "ID": 5,
+        "IDplantel": 6340,
+        "anio": "2023",
+        "grado": 10,
+        "area": "area1",
+        "regilla": "tiene",
+        "grado_actual": 70,
+        "ciclo_anterior": 65,
+        "idPrueba": 2
+    },
+    {
+        "ID": 6,
+        "IDplantel": 6341,
+        "anio": "2023",
+        "grado": 10,
+        "area": "area2",
+        "regilla": "no tiene",
+        "grado_actual": 68,
+        "ciclo_anterior": 64,
+        "idPrueba": 1
+    },
+    {
+        "ID": 7,
+        "IDplantel": 6340,
+        "anio": "2024",
+        "grado": 10,
+        "area": "area3",
+        "regilla": "tiene",
+        "grado_actual": 65,
+        "ciclo_anterior": 60,
+        "idPrueba": 4
+    },
+    {
+        "ID": 8,
+        "IDplantel": 6340,
+        "anio": "2023",
+        "grado": 10,
+        "area": "area4",
+        "regilla": "no tiene",
+        "grado_actual": 60,
+        "ciclo_anterior": 55,
+        "idPrueba": 3
+    },
+    {
+        "ID": 9,
+        "IDplantel": 6340,
+        "anio": "2023",
+        "grado": 11,
+        "area": "area5",
+        "regilla": "tiene",
+        "grado_actual": 75,
+        "ciclo_anterior": 70,
+        "idPrueba": 4
+    },
+    {
+        "ID": 10,
+        "IDplantel": 6340,
+        "anio": "2023",
+        "grado": 11,
+        "area": "area1",
+        "regilla": "no tiene",
+        "grado_actual": 73,
+        "ciclo_anterior": 69,
+        "idPrueba": 1
+    },
+    {
+        "ID": 11,
+        "IDplantel": 6340,
+        "anio": "2023",
+        "grado": 11,
+        "area": "area2",
+        "regilla": "tiene",
+        "grado_actual": 70,
+        "ciclo_anterior": 65,
+        "idPrueba": 4
+    },
+    {
+        "ID": 12,
+        "IDplantel": 6340,
+        "anio": "2023",
+        "grado": 11,
+        "area": "area3",
+        "regilla": "no tiene",
+        "grado_actual": 67,
+        "ciclo_anterior": 62,
+        "idPrueba": 2
+    },
+    {
+        "ID": 13,
+        "IDplantel": 6340,
+        "anio": "2024",
+        "grado": 12,
+        "area": "area4",
+        "regilla": "tiene",
+        "grado_actual": 80,
+        "ciclo_anterior": 75,
+        "idPrueba": 3
+    },
+    {
+        "ID": 14,
+        "IDplantel": 6341,
+        "anio": "2024",
+        "grado": 12,
+        "area": "area5",
+        "regilla": "no tiene",
+        "grado_actual": 78,
+        "ciclo_anterior": 73,
+        "idPrueba": 2
+    },
+    {
+        "ID": 15,
+        "IDplantel": 6340,
+        "anio": "2023",
+        "grado": 12,
+        "area": "area1",
+        "regilla": "tiene",
+        "grado_actual": 75,
+        "ciclo_anterior": 70,
+        "idPrueba": 4
+    },
+    {
+        "ID": 16,
+        "IDplantel": 6340,
+        "anio": "2023",
+        "grado": 12,
+        "area": "area2",
+        "regilla": "no tiene",
+        "grado_actual": 72,
+        "ciclo_anterior": 67,
+        "idPrueba": 1
+    },
+    {
+        "ID": 17,
+        "IDplantel": 6340,
+        "anio": "2024",
+        "grado": 13,
+        "area": "area3",
+        "regilla": "tiene",
+        "grado_actual": 85,
+        "ciclo_anterior": 80,
+        "idPrueba": 3
+    },
+    {
+        "ID": 18,
+        "IDplantel": 6340,
+        "anio": "2023",
+        "grado": 13,
+        "area": "area4",
+        "regilla": "no tiene",
+        "grado_actual": 83,
+        "ciclo_anterior": 78,
+        "idPrueba": 4
+    }
+]
