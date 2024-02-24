@@ -5,7 +5,7 @@
         "anio": "2023",
         "grado": 9,
         "area": "area1",
-        "regilla": "tiene",
+        "rejilla": true,
         "grado_actual": 66,
         "ciclo_anterior": 59,
         "idPrueba": 4
@@ -16,9 +16,9 @@
         "anio": "2023",
         "grado": 9,
         "area": "area2",
-        "regilla": "no tiene",
+        "rejilla": false,
         "grado_actual": 63,
-        "ciclo_anterior": 61,
+        "ciclo_anterior": 0,
         "idPrueba": 3
     },
     {
@@ -27,7 +27,7 @@
         "anio": "2023",
         "grado": 9,
         "area": "area3",
-        "regilla": "tiene",
+        "rejilla": true,
         "grado_actual": 61,
         "ciclo_anterior": 59,
         "idPrueba": 1
@@ -38,9 +38,9 @@
         "anio": "2023",
         "grado": 9,
         "area": "area4",
-        "regilla": "no tiene",
+        "rejilla": false,
         "grado_actual": 58,
-        "ciclo_anterior": 53,
+        "ciclo_anterior": 0,
         "idPrueba": 4
     },
     {
@@ -49,7 +49,7 @@
         "anio": "2023",
         "grado": 10,
         "area": "area1",
-        "regilla": "tiene",
+        "rejilla": true,
         "grado_actual": 70,
         "ciclo_anterior": 65,
         "idPrueba": 2
@@ -60,9 +60,9 @@
         "anio": "2023",
         "grado": 10,
         "area": "area2",
-        "regilla": "no tiene",
+        "rejilla": false,
         "grado_actual": 68,
-        "ciclo_anterior": 64,
+        "ciclo_anterior": 0,
         "idPrueba": 1
     },
     {
@@ -71,7 +71,7 @@
         "anio": "2024",
         "grado": 10,
         "area": "area3",
-        "regilla": "tiene",
+        "rejilla": true,
         "grado_actual": 65,
         "ciclo_anterior": 60,
         "idPrueba": 4
@@ -82,9 +82,9 @@
         "anio": "2023",
         "grado": 10,
         "area": "area4",
-        "regilla": "no tiene",
+        "rejilla": false,
         "grado_actual": 60,
-        "ciclo_anterior": 55,
+        "ciclo_anterior": 0,
         "idPrueba": 3
     },
     {
@@ -93,7 +93,7 @@
         "anio": "2023",
         "grado": 11,
         "area": "area5",
-        "regilla": "tiene",
+        "rejilla": true,
         "grado_actual": 75,
         "ciclo_anterior": 70,
         "idPrueba": 4
@@ -104,9 +104,9 @@
         "anio": "2023",
         "grado": 11,
         "area": "area1",
-        "regilla": "no tiene",
+        "rejilla": false,
         "grado_actual": 73,
-        "ciclo_anterior": 69,
+        "ciclo_anterior": 0,
         "idPrueba": 1
     },
     {
@@ -115,7 +115,7 @@
         "anio": "2023",
         "grado": 11,
         "area": "area2",
-        "regilla": "tiene",
+        "rejilla": true,
         "grado_actual": 70,
         "ciclo_anterior": 65,
         "idPrueba": 4
@@ -126,9 +126,9 @@
         "anio": "2023",
         "grado": 11,
         "area": "area3",
-        "regilla": "no tiene",
+        "rejilla": false,
         "grado_actual": 67,
-        "ciclo_anterior": 62,
+        "ciclo_anterior": 0,
         "idPrueba": 2
     },
     {
@@ -137,29 +137,29 @@
         "anio": "2024",
         "grado": 12,
         "area": "area4",
-        "regilla": "tiene",
+        "rejilla": true,
         "grado_actual": 80,
         "ciclo_anterior": 75,
         "idPrueba": 3
     },
     {
         "ID": 14,
-        "IDplantel": 6341,
-        "anio": "2024",
-        "grado": 12,
-        "area": "area5",
-        "regilla": "no tiene",
-        "grado_actual": 78,
-        "ciclo_anterior": 73,
-        "idPrueba": 2
+        "IDplantel": 6340,
+        "anio": "2023",
+        "grado": 10,
+        "area": "area4",
+        "rejilla": false,
+        "grado_actual": 60,
+        "ciclo_anterior": 0,
+        "idPrueba": 3
     },
     {
         "ID": 15,
         "IDplantel": 6340,
         "anio": "2023",
-        "grado": 12,
-        "area": "area1",
-        "regilla": "tiene",
+        "grado": 11,
+        "area": "area5",
+        "rejilla": true,
         "grado_actual": 75,
         "ciclo_anterior": 70,
         "idPrueba": 4
@@ -168,33 +168,22 @@
         "ID": 16,
         "IDplantel": 6340,
         "anio": "2023",
-        "grado": 12,
-        "area": "area2",
-        "regilla": "no tiene",
-        "grado_actual": 72,
-        "ciclo_anterior": 67,
+        "grado": 11,
+        "area": "area1",
+        "rejilla": false,
+        "grado_actual": 73,
+        "ciclo_anterior": 0,
         "idPrueba": 1
     },
     {
         "ID": 17,
         "IDplantel": 6340,
-        "anio": "2024",
-        "grado": 13,
-        "area": "area3",
-        "regilla": "tiene",
-        "grado_actual": 85,
-        "ciclo_anterior": 80,
-        "idPrueba": 3
-    },
-    {
-        "ID": 18,
-        "IDplantel": 6340,
         "anio": "2023",
-        "grado": 13,
-        "area": "area4",
-        "regilla": "no tiene",
-        "grado_actual": 83,
-        "ciclo_anterior": 78,
+        "grado": 11,
+        "area": "area2",
+        "rejilla": true,
+        "grado_actual": 70,
+        "ciclo_anterior": 65,
         "idPrueba": 4
     }
 ]
