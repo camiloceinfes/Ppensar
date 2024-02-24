@@ -5,14 +5,14 @@ import pensar.models.models as pen
 from fastapi.middleware.cors import CORSMiddleware
 app = FastAPI()
 
-pen.Base.metadata.create_all(bind=engine)
+#pen.Base.metadata.create_all(bind=engine)
 
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["*"],
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
+# app.add_middleware(
+#     CORSMiddleware,
+#     allow_origins=["*"],
+#     allow_credentials=True,
+#     allow_methods=["*"],
+#     allow_headers=["*"],
+# )
 
 app.include_router(router_pensar, prefix="/Pruebapensar", tags=["componente"])

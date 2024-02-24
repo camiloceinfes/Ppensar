@@ -16,8 +16,11 @@ def get_db():
         db.close()
 
 @router_pensar.get("/componente")
-async def component(grado: int, salon: str = None, area: str = None, comp: str = None, db: Session = Depends(get_db)):
-    pensar = Ppensar().calculate_componentes(grado, salon, area, comp, db)
+async def component(idColegio: int = None,
+                    grado: int = None, salon: str = None, 
+                    area: str = None, comp: str = None, 
+                    db: Session = Depends(get_db)):
+    pensar = Ppensar().calculate_componentes(idColegio, grado, salon, area, comp, db)
     return pensar
 
 @router_pensar.get("/competencias/{idColegio}")
@@ -34,5 +37,14 @@ async def area(idColegio: int,
     _area = Ppensar().calculate_area(idColegio, anio, idPrueba, db) #= pns().competencias(idColegio, db) código de colegio, año actual, id_area, id_prueba
     return _area
 
+@router_pensar.get("/grado")
+async def grado(idColegio: int, 
+               anio: Union[str, None] = None, 
+               idArea: Union[int, None] = None, 
+               idPrueba: Union[int, None] = None, 
+               db: Session = Depends(get_db)):
+    
+    _grado = Ppensar().calculate_grado(idColegio, anio, idPrueba, idArea, db) #= pns().competencias(idColegio, db) código de colegio, año actual, id_area, id_prueba
+    return _grado
 
 # (idColegio: int, area: Union[str, None] = None, materia: Union[str, None] = None, grado: Union[int, None] = None, db: Session = Depends(get_db)):
