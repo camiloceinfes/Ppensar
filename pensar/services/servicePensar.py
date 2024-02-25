@@ -1,11 +1,13 @@
 
 from pensar.models.models import componentes_model, competencias_model, Pensar
+from fastapi import HTTPException, status
 from sqlalchemy.orm import Session
 from sqlalchemy import or_, and_
 from functools import reduce
 from sqlalchemy import text
 import polars as pl
 import pandas as pd
+import numpy as np
 import json
 
 class Ppensar():
@@ -27,153 +29,169 @@ class Ppensar():
     def cycle_results(self, db):
         return ''
 
-    def calculate_componentes(self, idColegio, grado, salon, idArea, comp, db):
+    def calculate_componentes(self, codigoColegio, grado, salon, idComponente, idArea, db):
     
-        procedure_name = "BD_MARTESDEPRUEBA.dbo.SPR_Pensar_Componentes"
-
+        procedure_name = "BD_MARTESDEPRUEBA.dbo.SPR_Pensar_PuntajeGlobalPorComponente"
         try:
-
             query = text(f"EXEC {procedure_name} @Codigo=:Codigo, @Grado=:Grado, @Salon=:Salon, @IDArea=:IDArea, @IDComponente=:IDComponente")
-            result = db.execute(query, {"Codigo": idColegio, "Grado": grado, "Salon": salon, "IDArea": idArea, "IDComponente": comp}).fetchall()
+            result = db.execute(query, {"Codigo": codigoColegio, "Grado": grado, "Salon": salon, "IDArea": idArea, "IDComponente": idComponente}).fetchall()
             print(result)
             return json.loads(result[0][0])
         
         except Exception as e:
-            return f'error {e}'
+            print(f'error {e}')
+            return HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR , detail="Internal Server Error")
     
-    def calculate_competencias(self, idColegio: int, db: Session):
-        df = pl.read_database(db.query(competencias_model).filter(competencias_model.IDplantel == idColegio).statement, db.bind)
-        df = df.with_columns(
-            pl.when((pl.col("grado") == 1) | (pl.col("grado") == 2) | (pl.col("grado") == 3))
-            .then(1)
-            .when((pl.col("grado") == 4) | (pl.col("grado") == 5))
-            .then(2)
-            .when((pl.col("grado") == 6) | (pl.col("grado") == 7))
-            .then(3)
-            .when((pl.col("grado") == 8) | (pl.col("grado") == 9))
-            .then(4)
-            .otherwise(5)
-            .alias("CicloActual") #Pregunta_Estado
+    def calculate_competencias(self, codigoColegio, grado, salon, idCompetencia, idArea, db):
+    
+        procedure_name = "BD_MARTESDEPRUEBA.dbo.SPR_Pensar_PuntajeGlobalPorCompetencia"
+        try:
+
+            query = text(f"EXEC {procedure_name} @Codigo=:Codigo, @Grado=:Grado, @Salon=:Salon, @IDArea=:IDArea, @IDCompetencia=:IDCompetencia")
+            result = db.execute(query, {"Codigo": codigoColegio, "Grado": grado, "Salon": salon, "IDArea": idArea, "IDCompetencia": idCompetencia}).fetchall()
+            
+            return json.loads(result[0][0])
+
+        except Exception as e:
+            print(f'error {e}')
+            return HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR , detail="Internal Server Error")
+    
+    def calculate_area(self, codigoColegio: int, anio: int, idPurba: int, idArea: int, grado: int, salon: int, db: Session): 
+
+        procedure_name = "BD_MARTESDEPRUEBA.dbo.SPR_Pensar_Desempeno"
+
+        try:
+            query = text(f"EXEC {procedure_name} @CODIGO=:CODIGO, @ANNOA=:ANNOA, @IDPRUEBA=:IDPRUEBA, @IDAREA=:IDAREA, @GRADO=:GRADO, @SALON=:SALON")
+            result = db.execute(query, {"CODIGO": codigoColegio, "ANNOA": anio, "IDPRUEBA": idPurba, "IDAREA": idArea, "GRADO": grado, "SALON": salon}).fetchall()
+            
+            df = pl.DataFrame(result)
+            new_df = pl.DataFrame(
+            {
+                'prueba': df['column_0'].apply(lambda x: x[0]),
+                'grado': df['column_0'].apply(lambda x: x[1]),
+                'salon': df['column_0'].apply(lambda x: x[2]),
+                'area': df['column_0'].apply(lambda x: x[3]),
+                'Grado Actual': df['column_0'].apply(lambda x: x[4]),
+                'Ciclo Anterior': df['column_0'].apply(lambda x: x[5])
+            }
         )
+            grouped = new_df.groupby('area')
+            grado_actual_dict = {}
+            ciclo_anterior_dict = {}
 
-        pid_1 = df.groupby('nombrePrueba').mean().select(['nombrePrueba', 'porcentaje_de_acierto']).with_columns(structure = pl.lit('nombrePrueba')).rename({'nombrePrueba': 'name'}).to_pandas()
-        group_list = ['nombrePrueba', 'pregunta_Estado']
-        pid_2 = df.groupby(group_list).mean().sort(group_list).select(['pregunta_Estado', 'porcentaje_de_acierto', 'nombrePrueba']).with_columns(structure = pl.lit('pregunta_Estado')).rename({'pregunta_Estado': 'name', 'nombrePrueba': 'anterior'}).to_pandas()
-        group_list.append('CicloActual')
-        pid_3 = df.groupby(group_list).mean().sort(group_list).select(['CicloActual', 'porcentaje_de_acierto', 'pregunta_Estado']).with_columns(structure = pl.lit('CicloActual')).rename({'CicloActual': 'name', 'pregunta_Estado': 'anterior'}).to_pandas()
-        group_list.append('grado')
-        pid_4 = df.groupby(group_list).mean().sort(group_list).select(['grado', 'porcentaje_de_acierto', 'CicloActual']).with_columns(structure = pl.lit('grado')).rename({'grado': 'name', 'CicloActual': 'anterior'}).to_pandas()
-        group_list.append('area')
-        pid_5 = df.groupby(group_list).mean().sort(group_list).select(['area', 'porcentaje_de_acierto', 'grado']).with_columns(structure = pl.lit('area')).rename({'area': 'name', 'grado': 'anterior'}).to_pandas()
-        group_list.append('componente')
-        pid_6 = df.groupby(group_list).mean().sort(group_list).select(['componente', 'porcentaje_de_acierto', 'area']).with_columns(structure = pl.lit('componente')).rename({'componente': 'name', 'area': 'anterior'}).to_pandas()
-        group_list.append('competencia')
-        pid_7 = df.groupby(group_list).mean().sort(group_list).select(['competencia', 'porcentaje_de_acierto', 'componente']).with_columns(structure = pl.lit('competencia')).rename({'competencia': 'name', 'componente': 'anterior'}).to_pandas()
-        pid = pd.concat([pid_1, pid_2, pid_3, pid_4, pid_5, pid_6, pid_7], ignore_index=True)
+            for area, group in grouped:
+                grado_actual_dict[area] = group['Grado Actual'].to_list()
+                ciclo_anterior_dict[area] = group['Ciclo Anterior'].to_list()
 
-        def convertir_a_string(valor):
-            if isinstance(valor, int):
-                return 'Grado ' + str(valor)
-            else:
-                return valor
+            sorted_keys = sorted(grado_actual_dict.keys())
+            grado_actual_dict = {llave: grado_actual_dict[llave] for llave in sorted_keys}
+            ciclo_anterior_dict = {llave: ciclo_anterior_dict[llave] for llave in sorted_keys}
 
-        pid['name'] = pid['name'].apply(lambda x: convertir_a_string(x))
-        pid["id"] = pid.index + 1
-        anterior_to_id = pid.set_index('name')['id'].to_dict()
-        pid['pid'] = pid['anterior'].map(anterior_to_id)
-        pid.fillna('0', inplace=True)
-        pid.drop(columns='anterior', inplace=True)
-        pid['pid'] = pd.to_numeric(pid['pid'], downcast='integer')
-        pid['porcentaje_de_acierto'] = (pid['porcentaje_de_acierto'] * 100).round(2)
-        pid = pid.rename(columns={'porcentaje_de_acierto': 'value'}).to_dict(orient='records')
+            avrs_list_grado_actual = []
+            avrs_list_ciclo_anterior = []
 
-        return pid
-    
-    def calculate_area(self, idColegio: int, anio: str, idPrueba: int, db: Session):
-
-        #datos = db.query(pensar_dw).filter(and_(pensar_dw.Colegio == idColegio)).all()
-
-        with open(r'C:\Users\Camilo\Documents\tareas milton 8a\Nueva carpeta\app\prueba.json', 'r') as archivo:
-            datos = json.load(archivo)
+            # print(sorted_keys)
+            # print(f"Naturales: {np.mean(ciclo_anterior_dict[sorted_keys[0]])}")
+            # print(f"Definitiva: {np.mean(ciclo_anterior_dict[sorted_keys[1]])}")
+            # print(f"Inglés: {np.mean(ciclo_anterior_dict[sorted_keys[2]])}")
+            # print(f"Matemáticas: {np.mean(ciclo_anterior_dict[sorted_keys[3]])}")
             
-        df = pl.DataFrame(datos)    
-        condiciones = []
-        condiciones.append(pl.col('IDplantel') == idColegio)
-        if anio is not None:
-            condiciones.append(pl.col('anio') == anio)
-        if idPrueba is not None:
-            condiciones.append(pl.col('idPrueba') == idPrueba)
-        if condiciones:
-            df = df.filter(reduce(lambda a, b: a & b, condiciones))
-
-        print(df)
-        areas = []
-        ciclo_anterior = []
-        grado_actual = []
-
-        for area, ciclo, grado in zip(df['area'], df['ciclo_anterior'], df['grado_actual']):
-            areas.append(area)
-            ciclo_anterior.append(ciclo)
-            grado_actual.append(grado)
-
-        json_areas = {
-                    "title": "Desempeño por área",
-                    "label": "Promedio",
-                    "labels": ['Inglés', 'Lenguaje', 'Ciencias Naturales', 'Sociales', 'Matematicas'],
-                    "datasets": [
-                        {
-                        "label": "Ciclo anterior",
-                        "data": ciclo_anterior
-                        },
-                        {
-                        "label": "Grado actual",
-                        "data": grado_actual
-                        }
-                    ]
-                    }
-        return json_areas    
-    
-
-    def calculate_grado(self, idColegio: int, anio: str, idPrueba: int, idArea: int, db: Session):
-
-        #datos = db.query(pensar_dw).filter(and_(pensar_dw.Colegio == idColegio)).all()
-
-        with open(r'C:\Users\Camilo\Documents\tareas milton 8a\Nueva carpeta\app\prueba.json', 'r') as archivo:
-            datos = json.load(archivo)
+            for i in sorted_keys:
+                avrs_list_grado_actual.append(np.round(np.mean(grado_actual_dict[i]), 0))
+                avrs_list_ciclo_anterior.append(np.round(np.mean(ciclo_anterior_dict[i]), 0))
             
-        df = pl.DataFrame(datos)    
-        condiciones = []
-        condiciones.append(pl.col('IDplantel') == idColegio)
-        if anio is not None:
-            condiciones.append(pl.col('anio') == anio)
-        if idPrueba is not None:
-            condiciones.append(pl.col('idPrueba') == idPrueba)
-        if condiciones:
-            df = df.filter(reduce(lambda a, b: a & b, condiciones))
-
-        print(df)
-        areas = []
-        ciclo_anterior = []
-        grado_actual = []
-
-        for area, ciclo, grado in zip(df['area'], df['ciclo_anterior'], df['grado_actual']):
-            areas.append(area)
-            ciclo_anterior.append(ciclo)
-            grado_actual.append(grado)
-
-        json_areas = {
-                    "title": "Desempeño por área",
-                    "label": "Promedio",
-                    "labels": ['Inglés', 'Lenguaje', 'Ciencias Naturales', 'Sociales', 'Matematicas'],
-                    "datasets": [
-                        {
-                        "label": "Ciclo anterior",
-                        "data": ciclo_anterior
-                        },
-                        {
-                        "label": "Grado actual",
-                        "data": grado_actual
-                        }
-                    ]
+            json_areas = {
+                        "title": "Desempeño por área",
+                        "label": "Promedio",
+                        "labels": sorted_keys,
+                        "datasets": [
+                            {
+                            "label": "Ciclo anterior",
+                            "data": avrs_list_ciclo_anterior
+                            },
+                            {
+                            "label": "Grado actual",
+                            "data": avrs_list_grado_actual 
+                            }
+                        ]
                     }
-        return json_areas      
+            
+            return json_areas
+        except Exception as e:
+            print(f'error {e}')
+            return HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR , detail="Internal Server Error")
+
+    def calculate_grado(self, codigoColegio: int, anio: int, idPurba: int, idArea: int, grado: int, salon: int, db: Session): 
+
+        procedure_name = "BD_MARTESDEPRUEBA.dbo.SPR_Pensar_Desempeno"
+
+        try:
+            query = text(f"EXEC {procedure_name} @CODIGO=:CODIGO, @ANNOA=:ANNOA, @IDPRUEBA=:IDPRUEBA, @IDAREA=:IDAREA, @GRADO=:GRADO, @SALON=:SALON")
+            result = db.execute(query, {"CODIGO": codigoColegio, "ANNOA": anio, "IDPRUEBA": idPurba, "IDAREA": idArea, "GRADO": grado, "SALON": salon}).fetchall()
+            
+            df = pl.DataFrame(result)
+            new_df = pl.DataFrame(
+            {
+                'prueba': df['column_0'].apply(lambda x: x[0]),
+                'grado': df['column_0'].apply(lambda x: x[1]),
+                'salon': df['column_0'].apply(lambda x: x[2]),
+                'area': df['column_0'].apply(lambda x: x[3]),
+                'Grado Actual': df['column_0'].apply(lambda x: x[4]),
+                'Ciclo Anterior': df['column_0'].apply(lambda x: x[5])
+            }
+        )
+            grouped = new_df.groupby('grado')
+            grado_actual_dict = {}
+            ciclo_anterior_dict = {}
+
+            for area, group in grouped:
+                grado_actual_dict[area] = group['Grado Actual'].to_list()
+                ciclo_anterior_dict[area] = group['Ciclo Anterior'].to_list()
+
+            sorted_keys = sorted(grado_actual_dict.keys())
+            grado_actual_dict = {llave: grado_actual_dict[llave] for llave in sorted_keys}
+            ciclo_anterior_dict = {llave: ciclo_anterior_dict[llave] for llave in sorted_keys}
+
+            avrs_list_grado_actual = []
+            avrs_list_ciclo_anterior = []
+
+            # print(sorted_keys)
+            # print(f"Naturales: {np.mean(ciclo_anterior_dict[sorted_keys[0]])}")
+            # print(f"Definitiva: {np.mean(ciclo_anterior_dict[sorted_keys[1]])}")
+            # print(f"Inglés: {np.mean(ciclo_anterior_dict[sorted_keys[2]])}")
+            # print(f"Matemáticas: {np.mean(ciclo_anterior_dict[sorted_keys[3]])}")
+            
+            for i in sorted_keys:
+                avrs_list_grado_actual.append(np.round(np.mean(grado_actual_dict[i]), 0))
+                avrs_list_ciclo_anterior.append(np.round(np.mean(ciclo_anterior_dict[i]), 0))
+            
+            json_areas = {
+                        "title": "Desempeño por grado",
+                        "label": "Promedio",
+                        "labels": sorted_keys,
+                        "datasets": [
+                            {
+                            "label": "Ciclo anterior",
+                            "data": avrs_list_ciclo_anterior
+                            },
+                            {
+                            "label": "Grado actual",
+                            "data": avrs_list_grado_actual 
+                            }
+                        ]
+                    }
+            
+            return json_areas
+        except Exception as e:
+            print(f'error {e}')
+            return HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR , detail="Internal Server Error")
+
+    def parameters(self, codigoColegio, anio, db):
+    
+        return ''
+        
+
+# CREATE OR ALTER PROCEDURE [dbo].[SPR_Pensar_EnlazaaParametrosGenerales] (
+#     @Codigo int = 6340,
+#     @Anno int = 2023
+# )
