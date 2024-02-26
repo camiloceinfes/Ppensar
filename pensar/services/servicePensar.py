@@ -35,7 +35,7 @@ class Ppensar():
         try:
             query = text(f"EXEC {procedure_name} @Codigo=:Codigo, @Grado=:Grado, @Salon=:Salon, @IDArea=:IDArea, @IDComponente=:IDComponente")
             result = db.execute(query, {"Codigo": codigoColegio, "Grado": grado, "Salon": salon, "IDArea": idArea, "IDComponente": idComponente}).fetchall()
-            print(result)
+            #print(result)
             return json.loads(result[0][0])
         
         except Exception as e:
