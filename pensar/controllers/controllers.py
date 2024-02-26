@@ -140,4 +140,12 @@ async def student(codigoColegio: int, anio: int,
     _student = Ppensar().calculate_prueba_estudiantes(codigoColegio, anio, idPrueba, db)
     
     return _student
-    
+
+@router_pensar.get("/students/tasks", dependencies=[Depends(JwtBearer())], status_code=status.HTTP_200_OK, responses={
+    200: {"description": "Successful Response"},
+    404: {"description": "Resource not found"},
+    500: {"description": "Internal Server Error"}
+})
+async def tasks_students(code: int, year: int, idGrade: int, idArea: int, classroom: int = None, idPrueba: int = None, taskName: str = None, db: Session = Depends(get_db)):
+    tasks_students = Ppensar().students_tasks(code, year, idGrade, classroom, idPrueba, idArea, taskName, db)
+    return tasks_students

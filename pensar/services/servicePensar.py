@@ -36,18 +36,18 @@ class Ppensar():
         
         try:
             query = text(f"EXEC {procedure_name} @Codigo=:Codigo, @Anno=:Anno, @Grado=:Grado, @Salon=:Salon, @IDPrueba=:IDPrueba,@IDArea=:IDArea")
-            
-            result = []
+
             tasks = db.execute(query, {"Codigo": code, "Anno": year, "Grado": idGrade, "Salon": idClassroom or 0, "IDPrueba": idPrueba or 0, "IDArea": idArea or 0 }).fetchall()
+            print(tasks)
             
             if tasks and tasks[0][0] is not None:
-                result.append(json.loads(tasks[0][0]))
+                return json.loads(tasks[0][0])
                 
-            return result
+            return []
         except Exception as e:
             print(f'error {e}')
             raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR , detail="Internal Server Error")
-
+        
     def global_results(self, code, year, idPrueba, db):
         procedure_name = "BD_MARTESDEPRUEBA.dbo.SPR_Pensar_GlobalDesempeno"
         
@@ -319,4 +319,20 @@ class Ppensar():
             print(f'error {e}')
             #return HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR , detail="Internal Server Error")
             return []
+        
+    def students_tasks(self, code, year, idGrade, classroom, idPrueba, idArea, taskName, db):
+        procedure_name = "BD_MARTESDEPRUEBA.dbo.SPR_Pensar_EstudiantePorAprendizaje"
+        
+        try:
+            query = text(f"EXEC {procedure_name} @Codigo=:Codigo, @Anno=:Anno, @Grado=:Grado, @Salon=:Salon, @IDPrueba=:IDPrueba,@IDArea=:IDArea, @Tarea=:Tarea")
+
+            students_tasks = db.execute(query, {"Codigo": code, "Anno": year, "Grado": idGrade, "Salon": classroom or 0, "IDPrueba": idPrueba or 0, "IDArea": idArea or 0, "Tarea": taskName or "" }).fetchall()
+
+            if students_tasks and students_tasks[0][0] is not None:
+                json.loads(students_tasks[0][0])
+                
+            return []
+        except Exception as e:
+            print(f'error {e}')
+            raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR , detail="Internal Server Error")
         
