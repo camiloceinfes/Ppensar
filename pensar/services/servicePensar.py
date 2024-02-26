@@ -40,7 +40,8 @@ class Ppensar():
         
         except Exception as e:
             print(f'error {e}')
-            return HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR , detail="Internal Server Error")
+            #return HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR , detail="Internal Server Error")
+            return []
     
     def calculate_competencias(self, codigoColegio, grado, salon, idCompetencia, idArea, db):
     
@@ -54,7 +55,8 @@ class Ppensar():
 
         except Exception as e:
             print(f'error {e}')
-            return HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR , detail="Internal Server Error")
+            #return HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR , detail="Internal Server Error")
+            return []
     
     def calculate_area(self, codigoColegio: int, anio: int, idPurba: int, idArea: int, grado: int, salon: int, db: Session): 
 
@@ -119,7 +121,8 @@ class Ppensar():
             return json_areas
         except Exception as e:
             print(f'error {e}')
-            return HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR , detail="Internal Server Error")
+            #return HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR , detail="Internal Server Error")
+            return []
 
     def calculate_grado(self, codigoColegio: int, anio: int, idPurba: int, idArea: int, grado: int, salon: int, db: Session): 
 
@@ -260,7 +263,8 @@ class Ppensar():
 
         except Exception as e:
             print(f'error {e}')
-            return HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR , detail="Internal Server Error")
+            #return HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR , detail="Internal Server Error")
+            return []
         
 
 # Puesto

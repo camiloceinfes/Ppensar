@@ -54,6 +54,8 @@ async def components(codigoColegio: int = None,
                     idArea: int = None,
                     db: Session = Depends(get_db)):
     _componentes = Ppensar().calculate_componentes(codigoColegio, grado, salon, idComponente, idArea, db)
+    # if not _competencia:
+    #     return HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Competencie not found")
     return _componentes
 
 
@@ -69,8 +71,8 @@ async def competencies(codigoColegio: int = None,
                     idArea: int = None,
                     db: Session = Depends(get_db)):
     _competencia = Ppensar().calculate_competencias(codigoColegio, grado, salon, idCompetencia, idArea, db)
-    if not _competencia:
-        return HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Component not found")
+    # if not _competencia:
+    #     return HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Competencie not found")
     return _competencia
 
 @router_pensar.get("/area", dependencies=[Depends(JwtBearer())], status_code=status.HTTP_200_OK, responses={
@@ -108,17 +110,12 @@ async def grado(codigoColegio: int, anio: int,
         return HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Grade not found")
     return _grado
 
-@router_pensar.get("/students", dependencies=[Depends(JwtBearer())], status_code=status.HTTP_200_OK, responses={
-            200: {"description": "Successful Response"},
-            404: {"description": "Grade not found"},
-            500: {"description": "Internal Server Error"}
-        })
+@router_pensar.get("/students", dependencies=[Depends(JwtBearer())])
 async def student(codigoColegio: int, anio: int,
                idPrueba: Union[int, None] = None,  
                db: Session = Depends(get_db)):
-    
-    _prueba_students = Ppensar().calculate_prueba_estudiantes(codigoColegio, anio, idPrueba, db)
-    if not _prueba_students:
-        return HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Students not found")
-    return _prueba_students
+    _student = Ppensar().calculate_prueba_estudiantes(codigoColegio, anio, idPrueba, db)
+    # if not _student:
+    #     return HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Grade not found")
+    return _student
     
