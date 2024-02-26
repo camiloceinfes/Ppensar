@@ -1,16 +1,18 @@
-# version: '3.3'
+ version: '3.3'
 
-# services:
-#   prod:
-#     container_name: ppruebas
-#     image: ppruebas:1.0.0
-#     build: .
-# #      context: .
-# #      target: production
-# #      dockerfile: ./Dockerfile
-#     command: uvicorn app:app --host 0.0.0.0 --port 8000
-#     volumes:
-#       - ./app:/app
-# #      - ./.htaccess:/usr/share/nginx/html/dist/
-#     ports:
-#       - 8000:8000
+ services:
+   prod:
+     container_name: eppruebas
+     image: eppruebas:1.0.0
+     build: .
+ #      context: .
+ #      target: production
+ #      dockerfile: ./Dockerfile
+     command: uvicorn app:app --host 0.0.0.0 --port 3016
+     volumes:
+       - ./:/app
+ #      - ./.htaccess:/usr/share/nginx/html/dist/
+     ports:
+       - 3016:3016
+     env_file:
+       - .env
