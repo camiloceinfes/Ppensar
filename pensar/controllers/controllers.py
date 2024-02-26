@@ -42,12 +42,12 @@ async def component(db: Session = Depends(get_db)):
     cycle_results = Ppensar().cycle_results(db)
     return cycle_results
 
-@router_pensar.get("/componentes", dependencies=[Depends(JwtBearer())], status_code=status.HTTP_200_OK, responses={
+@router_pensar.get("/components", dependencies=[Depends(JwtBearer())], status_code=status.HTTP_200_OK, responses={
             200: {"description": "Successful Response"},
             404: {"description": "Tasks not found"},
             500: {"description": "Internal Server Error"}
         })
-async def component(codigoColegio: int = None,
+async def components(codigoColegio: int = None,
                     grado: int = None, 
                     salon: str = None, 
                     idComponente: str = None, 
@@ -57,12 +57,12 @@ async def component(codigoColegio: int = None,
     return _componentes
 
 
-@router_pensar.get("/competencias", dependencies=[Depends(JwtBearer())], status_code=status.HTTP_200_OK, responses={
+@router_pensar.get("/competencies", dependencies=[Depends(JwtBearer())], status_code=status.HTTP_200_OK, responses={
             200: {"description": "Successful Response"},
             404: {"description": "Tasks not found"},
             500: {"description": "Internal Server Error"}
         })
-async def component(codigoColegio: int = None,
+async def competencies(codigoColegio: int = None,
                     grado: int = None, 
                     salon: str = None, 
                     idCompetencia: int = None, 
@@ -107,3 +107,18 @@ async def grado(codigoColegio: int, anio: int,
     if not _grado:
         return HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Grade not found")
     return _grado
+
+@router_pensar.get("/students", dependencies=[Depends(JwtBearer())], status_code=status.HTTP_200_OK, responses={
+            200: {"description": "Successful Response"},
+            404: {"description": "Grade not found"},
+            500: {"description": "Internal Server Error"}
+        })
+async def student(codigoColegio: int, anio: int,
+               idPrueba: Union[int, None] = None,  
+               db: Session = Depends(get_db)):
+    
+    _prueba_students = Ppensar().calculate_prueba_estudiantes(codigoColegio, anio, idPrueba, db)
+    if not _prueba_students:
+        return HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Students not found")
+    return _prueba_students
+    

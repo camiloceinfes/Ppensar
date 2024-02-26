@@ -189,9 +189,97 @@ class Ppensar():
     def parameters(self, codigoColegio, anio, db):
     
         return ''
+    
+    def calculate_prueba_estudiantes(self, codigoColegio, anio, idPrueba, db):
+    
+        procedure_name = "BD_MARTESDEPRUEBA.dbo.SPR_Pensar_ListNotas"
+        try:
+
+            query = text(f"EXEC {procedure_name} @Codigo=:Codigo, @ANNOA=:ANNOA, @IDPRUEBA=:IDPRUEBA")
+            result = db.execute(query, {"Codigo": codigoColegio, "ANNOA": anio, "IDPRUEBA": idPrueba}).fetchall()
+            
+            #return json.loads(result[0][0])
+            df = pl.DataFrame(result)
+            #df_pandas = df.to_pandas()
+            
+            data = {
+                'Puesto': df['column_0'].apply(lambda x: x[0]),
+                'IdPrueba': df['column_0'].apply(lambda x: x[1]),
+                'Nombre Prueba': df['column_0'].apply(lambda x: x[2]),
+                'IdResultado': df['column_0'].apply(lambda x: x[3]),
+                'Grado': df['column_0'].apply(lambda x: x[4]),
+                'Salon': df['column_0'].apply(lambda x: x[5]),
+                'Estudiante': df['column_0'].apply(lambda x: x[6]),
+                'Nombres y Apellidos': df['column_0'].apply(lambda x: x[7]),
+                'Genérico': df['column_0'].apply(lambda x: x[8]),
+                'No Genérico': df['column_0'].apply(lambda x: x[9]),
+                'Biología': df['column_0'].apply(lambda x: x[10]),
+                'Química': df['column_0'].apply(lambda x: x[11]),
+                'Física': df['column_0'].apply(lambda x: x[12]),
+                'C.T.S': df['column_0'].apply(lambda x: x[13]),
+                'Sociales': df['column_0'].apply(lambda x: x[14]),
+                'Ciudadanas': df['column_0'].apply(lambda x: x[15]),
+                'Lenguaje': df['column_0'].apply(lambda x: x[16]),
+                'Inglés': df['column_0'].apply(lambda x: x[17]),
+                'Definitiva': df['column_0'].apply(lambda x: x[18]),
+                'Global': df['column_0'].apply(lambda x: x[19])
+            }
+            new_df = pd.DataFrame(data)
+            new_df = new_df.fillna(0)
+            new_df = new_df.to_dict(orient='records')
+
+            lista = []
+
+            for elemento in new_df:
+            
+                dicc = {
+                        "id": elemento['Puesto'],
+                        "grado": elemento['Grado'],
+                        "lista": elemento['Estudiante'],
+                        "nombre": elemento['Nombres y Apellidos'],
+                        "puesto": elemento['Puesto'],
+                        "genericos": elemento['Genérico'],
+                        "numGenericos": elemento['No Genérico'],
+                        "biologia": elemento['Biología'],
+                        "quimica": elemento['Química'],
+                        "fisica": elemento['Física'],
+                        "cts": elemento['C.T.S'],
+                        "sociales": elemento['Sociales'],
+                        "ciudadanas": elemento['Ciudadanas'],
+                        "lenguaje": elemento['Lenguaje'],
+                        "ingles": elemento['Inglés'],
+                        "definitiva": elemento['Definitiva'],
+                        "global": elemento['Global'],
+                        "empty": ""
+                    }
+            
+                lista.append(dicc)
+                
+            #print(lista)
+            return lista
+
+        except Exception as e:
+            print(f'error {e}')
+            return HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR , detail="Internal Server Error")
         
 
-# CREATE OR ALTER PROCEDURE [dbo].[SPR_Pensar_EnlazaaParametrosGenerales] (
-#     @Codigo int = 6340,
-#     @Anno int = 2023
-# )
+# Puesto
+# IdPrueba
+# Nombre Prueba
+# IdResultado
+# Grado
+# Salon
+# Estudiante
+# Nombres y Apellidos
+# Genérico
+# No Genérico
+# Biología
+# Química
+# Física
+# C.T.S
+# Sociales
+# Ciudadanas
+# Lenguaje
+# Inglés
+# Definitiva
+# Global
