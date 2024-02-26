@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, HTTPException, status
 from config.db import SessionLocal
 from pensar.services.servicePensar import Ppensar
 from sqlalchemy.orm import Session
@@ -15,14 +15,33 @@ def get_db():
         db.close()
 
 # protected_route (authorization header)
-@router_pensar.get("/tests", dependencies=[Depends(JwtBearer())] )
-async def tests(code: int, current_year: int, state: str = None, db: Session = Depends(get_db)):
-    test = Ppensar().get_tests(code, current_year, state, db)
+@router_pensar.get("/global-params", dependencies=[Depends(JwtBearer())], status_code=status.HTTP_200_OK, responses={
+    200: {"description": "Successful Response"},
+    404: {"description": "Resource not found"},
+    500: {"description": "Internal Server Error"}
+})
+async def global_params(code: int, year: int, db: Session = Depends(get_db)):
+    global_params = Ppensar().get_global_params(code, year, db)
+    
+    if not global_params:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Resource not found")
+    return global_params
+
+@router_pensar.get("/tests", dependencies=[Depends(JwtBearer())], status_code=status.HTTP_200_OK )
+async def tests(code: int, year: int, db: Session = Depends(get_db)):
+    test = Ppensar().get_tests(code, year, db)
     return test
 
-@router_pensar.get("/tasks", dependencies=[Depends(JwtBearer())])
-async def task(grado: int, salon: str = None, area: str = None,  db: Session = Depends(get_db)):
-    tasks = Ppensar().get_tasks(grado, salon, area, db)
+@router_pensar.get("/tasks", dependencies=[Depends(JwtBearer())], status_code=status.HTTP_200_OK, responses={
+    200: {"description": "Successful Response"},
+    404: {"description": "Tasks not found"},
+    500: {"description": "Internal Server Error"}
+})
+async def task(code: int, year: int,  idGrade: int, idClassroom: int = None, idPrueba: int = None, idArea: int = None, db: Session = Depends(get_db)):
+    tasks = Ppensar().get_tasks(code, year, idGrade, idClassroom, idPrueba, idArea, db)
+    
+    if not tasks:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Tasks not found")
     return tasks
 
 @router_pensar.get("/results", dependencies=[Depends(JwtBearer())])

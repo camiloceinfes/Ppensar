@@ -1,7 +1,6 @@
-
-from pensar.models.models import componentes_model, competencias_model, Pensar
+from fastapi import HTTPException, status
+from pensar.models.models import competencias_model, Pensar
 from sqlalchemy.orm import Session
-from sqlalchemy import or_, and_
 from functools import reduce
 from sqlalchemy import text
 import polars as pl
@@ -9,6 +8,19 @@ import pandas as pd
 import json
 
 class Ppensar():
+    
+    def get_global_params(self, code, year, db):
+        procedure_name = "BD_MARTESDEPRUEBA.dbo.SPR_Pensar_EnlazaaParametrosGenerales"
+        
+        try:
+            query = text(f"EXEC {procedure_name} @Codigo=:Codigo, @Anno=:Anno")
+            result = db.execute(query, {"Codigo": code, "Anno": year }).fetchall()
+            
+            return json.loads(result[0][0])
+        except Exception as e:
+            print(f'error {e}')
+            raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR , detail="Internal Server Error")
+        
     def get_tests(self, code, current_year, state, db):
         pensar = db.query(Pensar).filter(Pensar.año_ciclo == current_year).all()
         if not pensar:
@@ -18,8 +30,17 @@ class Ppensar():
             }
         return pensar
 
-    def get_tasks(self, grado, salon, area, db):
-        return ''
+    def get_tasks(self,code, year, idGrade, idClassroom, idPrueba, idArea, db):
+        procedure_name = "BD_MARTESDEPRUEBA.dbo.SPR_Pensar_PuntajeGlobalPorAprendizaje"
+        
+        try:
+            query = text(f"EXEC {procedure_name} @Codigo=:Codigo, @Anno=:Anno, @Grado=:Grado, @Salon=:Salon, @IDPrueba=:IDPrueba,@IDArea=:IDArea")
+            result = db.execute(query, {"Codigo": code, "Anno": year, "Grado": idGrade, "Salon": idClassroom, "IDPrueba": idPrueba, "IDArea": idArea }).fetchall()
+            
+            return json.loads(result[0][0])
+        except Exception as e:
+            print(f'error {e}')
+            raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR , detail="Internal Server Error")
 
     def global_results(self, db):
         return ''
@@ -27,8 +48,7 @@ class Ppensar():
     def cycle_results(self, db):
         return ''
 
-    def calculate_componentes(self, idColegio, grado, salon, idArea, comp, db):
-    
+    def calculate_componentes(self, idColegio, grado, salon, comp, idArea, db):
         procedure_name = "BD_MARTESDEPRUEBA.dbo.SPR_Pensar_Componentes"
 
         try:
