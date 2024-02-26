@@ -36,15 +36,45 @@ class Ppensar():
         
         try:
             query = text(f"EXEC {procedure_name} @Codigo=:Codigo, @Anno=:Anno, @Grado=:Grado, @Salon=:Salon, @IDPrueba=:IDPrueba,@IDArea=:IDArea")
-            result = db.execute(query, {"Codigo": code, "Anno": year, "Grado": idGrade, "Salon": idClassroom, "IDPrueba": idPrueba, "IDArea": idArea }).fetchall()
             
-            return json.loads(result[0][0])
+            result = []
+            tasks = db.execute(query, {"Codigo": code, "Anno": year, "Grado": idGrade, "Salon": idClassroom or 0, "IDPrueba": idPrueba or 0, "IDArea": idArea or 0 }).fetchall()
+            
+            if tasks and tasks[0][0] is not None:
+                result.append(json.loads(tasks[0][0]))
+                
+            return result
         except Exception as e:
             print(f'error {e}')
             raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR , detail="Internal Server Error")
 
-    def global_results(self, db):
-        return ''
+    def global_results(self, code, year, idPrueba, db):
+        procedure_name = "BD_MARTESDEPRUEBA.dbo.SPR_Pensar_GlobalDesempeno"
+        
+        try:
+            query = text(f"EXEC {procedure_name} @CODIGO=:Codigo, @ANNOA=:Anno, @IDPRUEBA=:IDPrueba")
+            result = db.execute(query, {"Codigo": code, "Anno": year, "IDPrueba": idPrueba or -2 }).fetchall()
+            
+            performance = []
+            
+            for row in result:
+                name = row[1]
+                current_cycle = float(row[2])
+                previous_cycle = float(row[3])
+                data = {
+                    "currentCycle": current_cycle,
+                    "previosCycle": previous_cycle
+                }
+                obj_response = {
+                    "name": name,
+                    "data": [data]
+                }
+                performance.append(obj_response)
+            
+            return performance
+        except Exception as e:
+            print(f'error {e}')
+            raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Internal Server Error")
 
     def cycle_results(self, db):
         return ''
@@ -60,7 +90,7 @@ class Ppensar():
         
         except Exception as e:
             print(f'error {e}')
-            return HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR , detail="Internal Server Error")
+            raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR , detail="Internal Server Error")
     
     def calculate_competencias(self, codigoColegio, grado, salon, idCompetencia, idArea, db):
     
@@ -74,7 +104,7 @@ class Ppensar():
 
         except Exception as e:
             print(f'error {e}')
-            return HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR , detail="Internal Server Error")
+            raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR , detail="Internal Server Error")
     
     def calculate_area(self, codigoColegio: int, anio: int, idPurba: int, idArea: int, grado: int, salon: int, db: Session): 
 
@@ -127,11 +157,13 @@ class Ppensar():
                         "datasets": [
                             {
                             "label": "Ciclo anterior",
-                            "data": avrs_list_ciclo_anterior
+                            "data": avrs_list_ciclo_anterior,
+                            "backgroundColor": "#026190"
                             },
                             {
                             "label": "Grado actual",
-                            "data": avrs_list_grado_actual 
+                            "data": avrs_list_grado_actual,
+                            "backgroundColor": "#DC3D3D"
                             }
                         ]
                     }
@@ -192,11 +224,13 @@ class Ppensar():
                         "datasets": [
                             {
                             "label": "Ciclo anterior",
-                            "data": avrs_list_ciclo_anterior
+                            "data": avrs_list_ciclo_anterior,
+                            "backgroundColor": "#026190"
                             },
                             {
                             "label": "Grado actual",
-                            "data": avrs_list_grado_actual 
+                            "data": avrs_list_grado_actual,
+                            "backgroundColor": "#DC3D3D"
                             }
                         ]
                     }

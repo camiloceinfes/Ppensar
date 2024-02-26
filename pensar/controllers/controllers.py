@@ -40,14 +40,11 @@ async def tests(code: int, year: int, db: Session = Depends(get_db)):
 })
 async def task(code: int, year: int,  idGrade: int, idClassroom: int = None, idPrueba: int = None, idArea: int = None, db: Session = Depends(get_db)):
     tasks = Ppensar().get_tasks(code, year, idGrade, idClassroom, idPrueba, idArea, db)
-    
-    if not tasks:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Tasks not found")
     return tasks
 
 @router_pensar.get("/results", dependencies=[Depends(JwtBearer())])
-async def results(db: Session = Depends(get_db)):
-    results = Ppensar().global_results(db)
+async def results(code: int, year: int, idPrueba:int = None, db: Session = Depends(get_db)):
+    results = Ppensar().global_results(code, year, idPrueba, db)
     return results
 
 @router_pensar.get("/cycle/results", dependencies=[Depends(JwtBearer())])
