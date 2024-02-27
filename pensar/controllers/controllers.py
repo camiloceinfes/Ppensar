@@ -47,18 +47,19 @@ async def component(db: Session = Depends(get_db)):
             404: {"description": "Tasks not found"},
             500: {"description": "Internal Server Error"}
         })
-async def components(codigoColegio: int = None,
-                    grado: int = None, 
-                    salon: str = None, 
-                    idComponente: str = None, 
-                    idArea: int = None,
+async def components(codigoColegio: int, anio: int, 
+                    grado: Union[int, None] = None, 
+                    salon: Union[str, None] = None, 
+                    idComponente: Union[int, None] = None, 
+                    idArea: Union[int, None] = None, 
                     db: Session = Depends(get_db)):
-        
+    
+    grado = grado or 0    
     salon = salon or 0
     idComponente = idComponente or 0
     idArea = idArea or 0
 
-    _componentes = Ppensar().calculate_componentes(codigoColegio, grado, salon, idComponente, idArea, db)
+    _componentes = Ppensar().calculate_componentes(codigoColegio, anio, grado, salon, idComponente, idArea, db)
     # if not _competencia:
     #     return HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Competencie not found")
     return _componentes
@@ -69,18 +70,19 @@ async def components(codigoColegio: int = None,
             404: {"description": "Tasks not found"},
             500: {"description": "Internal Server Error"}
         })
-async def competencies(codigoColegio: int = None,
-                    grado: int = None, 
-                    salon: str = None, 
-                    idCompetencia: int = None, 
-                    idArea: int = None,
+async def competencies(codigoColegio: int, anio: int, 
+                    grado: Union[int, None] = None, 
+                    salon: Union[str, None] = None, 
+                    idCompetencia: Union[int, None] = None, 
+                    idArea: Union[int, None] = None, 
                     db: Session = Depends(get_db)):
-        
+    
+    grado = grado or 0 
     salon = salon or 0
     idCompetencia = idCompetencia or 0
     idArea = idArea or 0
 
-    _competencia = Ppensar().calculate_competencias(codigoColegio, grado, salon, idCompetencia, idArea, db)
+    _competencia = Ppensar().calculate_competencias(codigoColegio, anio, grado, salon, idCompetencia, idArea, db)
     # if not _competencia:
     #     return HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Competencie not found")
     return _competencia
@@ -134,4 +136,11 @@ async def student(codigoColegio: int, anio: int,
     # if not _student:
     #     return HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Grade not found")
     return _student
+
+@router_pensar.get("/detail", dependencies=[Depends(JwtBearer())])
+async def detail(db: Session = Depends(get_db)):
+    _detail = Ppensar().detail_test(db)
+    # if not _student:
+    #     return HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Grade not found")
+    return _detail
     
