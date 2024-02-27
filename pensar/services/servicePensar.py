@@ -3,6 +3,7 @@ from pensar.models.models import Pensar
 from sqlalchemy.orm import Session
 from functools import reduce
 from sqlalchemy import text
+from datetime import datetime
 import polars as pl
 import pandas as pd
 import numpy as np
@@ -28,20 +29,23 @@ class Ppensar():
         try:
             query = text(f"EXEC {procedure_name} @CODIGO=:Codigo, @ANNOA=:Anno, @IDPRUEBA=:IDPrueba, @CICLO_GRADO=:CicloGrado")
             result = db.execute(query, {"Codigo": code, "Anno": year, "IDPrueba": idTest or -1, "CicloGrado": -2  }).fetchall()
-            print(result)
+
             tests = []
             
             for row in result:
-                name = row[0]
-                cycle = row[1]
-                global_score = row[3]
-                results = row[4]
-                
+                date = row[7]
+                formatted_date = None  # Initialize formatted_date
+                if date:
+                    formatted_date = datetime.strftime(date, "%Y-%m-%d")
+                    
                 test = {
-                    "name": name,
-                    "cycle": cycle,
-                    "globalScore": global_score,
-                    "resultsTotal": results
+                    "id": row[0],
+                    "name": row[1],
+                    "img": row[2],
+                    "cycle": row[3],
+                    "globalScore": row[5],
+                    "resultsTotal": row[6],
+                    "date": formatted_date or None,
                 }
                 
                 tests.append(test)
@@ -59,8 +63,7 @@ class Ppensar():
             query = text(f"EXEC {procedure_name} @Codigo=:Codigo, @Anno=:Anno, @Grado=:Grado, @Salon=:Salon, @IDPrueba=:IDPrueba,@IDArea=:IDArea")
 
             tasks = db.execute(query, {"Codigo": code, "Anno": year, "Grado": idGrade or 0, "Salon": idClassroom or 0, "IDPrueba": idPrueba or 0, "IDArea": idArea or 0 }).fetchall()
-            print(tasks)
-            
+
             if tasks and tasks[0][0] is not None:
                 return json.loads(tasks[0][0])
                 
@@ -103,7 +106,7 @@ class Ppensar():
         try:
             query = text(f"EXEC {procedure_name} @CODIGO=:Codigo, @ANNOA=:Anno, @IDPRUEBA=:IDPrueba, @CICLO_GRADO=:CicloGrado")
             result = db.execute(query, {"Codigo": code, "Anno": year, "IDPrueba": idPrueba or -2, "CicloGrado": -1}).fetchall()
-            
+
             performance = {}
             global_score_by_cycle = self.calculate_weighted_average(code, year, idPrueba, db)
             
@@ -111,9 +114,9 @@ class Ppensar():
             percentage_dict = {item['cycle']: item['score'] for item in global_score_by_cycle}
             
             for row in result:
-                cycle = row[1]
-                grade = row[2]
-                score_grade = float(row[3])
+                cycle = row[3]
+                grade = row[4]
+                score_grade = float(row[5])
                 
                 if cycle not in performance:
                     performance[cycle] = {
@@ -146,10 +149,10 @@ class Ppensar():
             scores = []
             
             for row in result:
-                global_score = row[3]
+                global_score = row[5]
                 
                 obj = {
-                    "cycle": row[1],
+                    "cycle": row[3],
                     "score": global_score
                 }
                 
