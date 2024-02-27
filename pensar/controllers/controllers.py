@@ -28,9 +28,13 @@ async def global_params(code: int, year: int, db: Session = Depends(get_db)):
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Resource not found")
     return global_params
 
-@router_pensar.get("/tests", dependencies=[Depends(JwtBearer())], status_code=status.HTTP_200_OK )
-async def tests(code: int, year: int, db: Session = Depends(get_db)):
-    test = Ppensar().get_tests(code, year, db)
+@router_pensar.get("/tests", dependencies=[Depends(JwtBearer())], status_code=status.HTTP_200_OK, responses={
+    200: {"description": "Successful Response"},
+    404: {"description": "Resource not found"},
+    500: {"description": "Internal Server Error"}
+} )
+async def tests(code: int, year: int, idTest:int = None, db: Session = Depends(get_db)):
+    test = Ppensar().get_tests(code, year, idTest, db)
     return test
 
 @router_pensar.get("/tasks", dependencies=[Depends(JwtBearer())], status_code=status.HTTP_200_OK, responses={
@@ -38,18 +42,26 @@ async def tests(code: int, year: int, db: Session = Depends(get_db)):
     404: {"description": "Tasks not found"},
     500: {"description": "Internal Server Error"}
 })
-async def task(code: int, year: int,  idGrade: int, idClassroom: int = None, idPrueba: int = None, idArea: int = None, db: Session = Depends(get_db)):
+async def task(code: int, year: int,  idGrade: int = None, idClassroom: int = None, idPrueba: int = None, idArea: int = None, db: Session = Depends(get_db)):
     tasks = Ppensar().get_tasks(code, year, idGrade, idClassroom, idPrueba, idArea, db)
     return tasks
 
-@router_pensar.get("/results", dependencies=[Depends(JwtBearer())])
+@router_pensar.get("/results", dependencies=[Depends(JwtBearer())], status_code=status.HTTP_200_OK, responses={
+    200: {"description": "Successful Response"},
+    404: {"description": "Results not found"},
+    500: {"description": "Internal Server Error"}
+})
 async def results(code: int, year: int, idPrueba:int = None, db: Session = Depends(get_db)):
     results = Ppensar().global_results(code, year, idPrueba, db)
     return results
 
-@router_pensar.get("/cycle/results", dependencies=[Depends(JwtBearer())])
-async def component(db: Session = Depends(get_db)):
-    cycle_results = Ppensar().cycle_results(db)
+@router_pensar.get("/cycle/results", dependencies=[Depends(JwtBearer())], status_code=status.HTTP_200_OK, responses={
+    200: {"description": "Successful Response"},
+    404: {"description": "Results not found"},
+    500: {"description": "Internal Server Error"}
+})
+async def cycle_results(code: int, year: int, idPrueba:int = None, db: Session = Depends(get_db)):
+    cycle_results = Ppensar().cycle_results(code, year, idPrueba, db)
     return cycle_results
 
 @router_pensar.get("/components", dependencies=[Depends(JwtBearer())], status_code=status.HTTP_200_OK, responses={
@@ -146,6 +158,6 @@ async def student(codigoColegio: int, anio: int,
     404: {"description": "Resource not found"},
     500: {"description": "Internal Server Error"}
 })
-async def tasks_students(code: int, year: int, idGrade: int, idArea: int, classroom: int = None, idPrueba: int = None, taskName: str = None, db: Session = Depends(get_db)):
+async def tasks_students(code: int, year: int, idGrade: int, idArea: int, taskName: str, classroom: int = None, idPrueba: int = None, db: Session = Depends(get_db)):
     tasks_students = Ppensar().students_tasks(code, year, idGrade, classroom, idPrueba, idArea, taskName, db)
     return tasks_students

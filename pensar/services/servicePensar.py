@@ -22,14 +22,35 @@ class Ppensar():
             print(f'error {e}')
             raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR , detail="Internal Server Error")
         
-    def get_tests(self, code, current_year, state, db):
-        pensar = db.query(Pensar).filter(Pensar.año_ciclo == current_year).all()
-        if not pensar:
-            return { 
-                "status_code": "404",
-                "message": "Resource not found" 
-            }
-        return pensar
+    def get_tests(self, code, year, idTest, db):
+        procedure_name = "BD_MARTESDEPRUEBA.dbo.SPR_Pensar_GradoCicloDesempeno"
+        
+        try:
+            query = text(f"EXEC {procedure_name} @CODIGO=:Codigo, @ANNOA=:Anno, @IDPRUEBA=:IDPrueba, @CICLO_GRADO=:CicloGrado")
+            result = db.execute(query, {"Codigo": code, "Anno": year, "IDPrueba": idTest or -1, "CicloGrado": -2  }).fetchall()
+            print(result)
+            tests = []
+            
+            for row in result:
+                name = row[0]
+                cycle = row[1]
+                global_score = row[3]
+                results = row[4]
+                
+                test = {
+                    "name": name,
+                    "cycle": cycle,
+                    "globalScore": global_score,
+                    "resultsTotal": results
+                }
+                
+                tests.append(test)
+
+            return tests
+        except Exception as e:
+            print(f'error {e}')
+            raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Internal Server Error")
+        
 
     def get_tasks(self,code, year, idGrade, idClassroom, idPrueba, idArea, db):
         procedure_name = "BD_MARTESDEPRUEBA.dbo.SPR_Pensar_PuntajeGlobalPorAprendizaje"
@@ -37,7 +58,7 @@ class Ppensar():
         try:
             query = text(f"EXEC {procedure_name} @Codigo=:Codigo, @Anno=:Anno, @Grado=:Grado, @Salon=:Salon, @IDPrueba=:IDPrueba,@IDArea=:IDArea")
 
-            tasks = db.execute(query, {"Codigo": code, "Anno": year, "Grado": idGrade, "Salon": idClassroom or 0, "IDPrueba": idPrueba or 0, "IDArea": idArea or 0 }).fetchall()
+            tasks = db.execute(query, {"Codigo": code, "Anno": year, "Grado": idGrade or 0, "Salon": idClassroom or 0, "IDPrueba": idPrueba or 0, "IDArea": idArea or 0 }).fetchall()
             print(tasks)
             
             if tasks and tasks[0][0] is not None:
@@ -76,8 +97,68 @@ class Ppensar():
             print(f'error {e}')
             raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Internal Server Error")
 
-    def cycle_results(self, db):
-        return ''
+    def cycle_results(self, code, year, idPrueba, db):
+        procedure_name = "BD_MARTESDEPRUEBA.dbo.SPR_Pensar_GradoCicloDesempeno"
+    
+        try:
+            query = text(f"EXEC {procedure_name} @CODIGO=:Codigo, @ANNOA=:Anno, @IDPRUEBA=:IDPrueba, @CICLO_GRADO=:CicloGrado")
+            result = db.execute(query, {"Codigo": code, "Anno": year, "IDPrueba": idPrueba or -2, "CicloGrado": -1}).fetchall()
+            
+            performance = {}
+            global_score_by_cycle = self.calculate_weighted_average(code, year, idPrueba, db)
+            
+            # Initialize percentage dictionary
+            percentage_dict = {item['cycle']: item['score'] for item in global_score_by_cycle}
+            
+            for row in result:
+                cycle = row[1]
+                grade = row[2]
+                score_grade = float(row[3])
+                
+                if cycle not in performance:
+                    performance[cycle] = {
+                        "cycle": cycle,
+                        "percentage": percentage_dict.get(cycle, 0),  # Initialize percentage with 0 if not found
+                        "grades": []
+                    }
+                
+                data = {
+                    "name": f"{grade}°",
+                    "score": score_grade
+                }
+                performance[cycle]["grades"].append(data)
+            
+            # Convert dictionary values to list
+            performance_list = list(performance.values())
+            
+            return performance_list  # list of dictionaries
+        except Exception as e:
+            print(f'error {e}')
+            raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Internal Server Error")
+        
+    def calculate_weighted_average(self, code, year, idPrueba, db):
+        procedure_name = "BD_MARTESDEPRUEBA.dbo.SPR_Pensar_GradoCicloDesempeno"
+        
+        try:
+            query = text(f"EXEC {procedure_name} @CODIGO=:Codigo, @ANNOA=:Anno, @IDPRUEBA=:IDPrueba, @CICLO_GRADO=:CicloGrado")
+            result = db.execute(query, {"Codigo": code, "Anno": year, "IDPrueba": idPrueba or -2, "CicloGrado": -2  }).fetchall()
+            
+            scores = []
+            
+            for row in result:
+                global_score = row[3]
+                
+                obj = {
+                    "cycle": row[1],
+                    "score": global_score
+                }
+                
+                scores.append(obj)
+            
+            return scores
+        except Exception as e:
+            print(f'error {e}')
+            raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Internal Server Error")
 
     def calculate_componentes(self, codigoColegio, grado, salon, idComponente, idArea, db):
         
@@ -326,10 +407,10 @@ class Ppensar():
         try:
             query = text(f"EXEC {procedure_name} @Codigo=:Codigo, @Anno=:Anno, @Grado=:Grado, @Salon=:Salon, @IDPrueba=:IDPrueba,@IDArea=:IDArea, @Tarea=:Tarea")
 
-            students_tasks = db.execute(query, {"Codigo": code, "Anno": year, "Grado": idGrade, "Salon": classroom or 0, "IDPrueba": idPrueba or 0, "IDArea": idArea or 0, "Tarea": taskName or "" }).fetchall()
+            students_tasks = db.execute(query, {"Codigo": code, "Anno": year, "Grado": idGrade, "Tarea": taskName, "Salon": classroom or 0, "IDPrueba": idPrueba or 0, "IDArea": idArea or 0  }).fetchall()
 
             if students_tasks and students_tasks[0][0] is not None:
-                json.loads(students_tasks[0][0])
+                return json.loads(students_tasks[0][0])
                 
             return []
         except Exception as e:
