@@ -1,5 +1,5 @@
 from fastapi import HTTPException, status
-from pensar.models.models import Pensar
+from collections import namedtuple
 from sqlalchemy.orm import Session
 from functools import reduce
 from sqlalchemy import text
@@ -163,12 +163,12 @@ class Ppensar():
             print(f'error {e}')
             raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Internal Server Error")
 
-    def calculate_componentes(self, codigoColegio, grado, salon, idComponente, idArea, db):
+    def calculate_componentes(self, codigoColegio, anio, grado, salon, idComponente, idArea, db):
         
         procedure_name = "BD_MARTESDEPRUEBA.dbo.SPR_Pensar_PuntajeGlobalPorComponente"
         try:
-            query = text(f"EXEC {procedure_name} @Codigo=:Codigo, @Grado=:Grado, @Salon=:Salon, @IDArea=:IDArea, @IDComponente=:IDComponente")
-            result = db.execute(query, {"Codigo": codigoColegio, "Grado": grado, "Salon": salon, "IDArea": idArea, "IDComponente": idComponente}).fetchall()
+            query = text(f"EXEC {procedure_name} @Codigo=:Codigo, @ANNO=:ANNO, @Grado=:Grado, @Salon=:Salon, @IDArea=:IDArea, @IDComponente=:IDComponente")
+            result = db.execute(query, {"Codigo": codigoColegio, "ANNO": anio, "Grado": grado, "Salon": salon, "IDArea": idArea, "IDComponente": idComponente}).fetchall()
             #print(result)
             return json.loads(result[0][0])
         
@@ -177,13 +177,13 @@ class Ppensar():
             #return HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR , detail="Internal Server Error")
             return []
     
-    def calculate_competencias(self, codigoColegio, grado, salon, idCompetencia, idArea, db):
+    def calculate_competencias(self, codigoColegio, anio, grado, salon, idCompetencia, idArea, db):
     
         procedure_name = "BD_MARTESDEPRUEBA.dbo.SPR_Pensar_PuntajeGlobalPorCompetencia"
         try:
 
-            query = text(f"EXEC {procedure_name} @Codigo=:Codigo, @Grado=:Grado, @Salon=:Salon, @IDArea=:IDArea, @IDCompetencia=:IDCompetencia")
-            result = db.execute(query, {"Codigo": codigoColegio, "Grado": grado, "Salon": salon, "IDArea": idArea, "IDCompetencia": idCompetencia}).fetchall()
+            query = text(f"EXEC {procedure_name} @Codigo=:Codigo, @ANNO=:ANNO, @Grado=:Grado, @Salon=:Salon, @IDArea=:IDArea, @IDCompetencia=:IDCompetencia")
+            result = db.execute(query, {"Codigo": codigoColegio, "ANNO": anio, "Grado": grado, "Salon": salon, "IDArea": idArea, "IDCompetencia": idCompetencia}).fetchall()
             
             return json.loads(result[0][0])
 
@@ -339,6 +339,7 @@ class Ppensar():
             query = text(f"EXEC {procedure_name} @Codigo=:Codigo, @ANNOA=:ANNOA, @IDPRUEBA=:IDPRUEBA")
             result = db.execute(query, {"Codigo": codigoColegio, "ANNOA": anio, "IDPRUEBA": idPrueba}).fetchall()
             
+            print(result)
             #return json.loads(result[0][0])
             df = pl.DataFrame(result)
             #df_pandas = df.to_pandas()
@@ -420,3 +421,18 @@ class Ppensar():
             print(f'error {e}')
             raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR , detail="Internal Server Error")
         
+    def detail_test(self, db):
+    
+        procedure_name = "BD_MARTESDEPRUEBA.dbo.SPR_Pensar_DetallePrueba"
+        try:
+            query = text(f"EXEC {procedure_name} ")
+            result = db.execute(query, {}).fetchall()
+            #df = pl.DataFrame(result)
+            #print(df)
+
+            return result
+
+        except Exception as e:
+            print(f'error {e}')
+            #return HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR , detail="Internal Server Error")
+            return []
