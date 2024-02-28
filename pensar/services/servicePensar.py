@@ -8,6 +8,7 @@ import polars as pl
 import pandas as pd
 import numpy as np
 import json
+import math 
 
 class Ppensar():
     
@@ -86,8 +87,8 @@ class Ppensar():
                 current_cycle = float(row[2])
                 previous_cycle = float(row[3])
                 data = {
-                    "currentCycle": current_cycle,
-                    "previosCycle": previous_cycle
+                    "currentCycle": math.floor(current_cycle),
+                    "previosCycle": math.floor(previous_cycle)
                 }
                 obj_response = {
                     "name": name,
