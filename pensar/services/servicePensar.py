@@ -282,8 +282,8 @@ class Ppensar():
             with open(ruta_json, encoding='utf-8') as f:
                 datos = json.load(f)
 
-            print(datos)#return list(result[0])
-            return 'prueba2'
+            #print(datos)#return list(result[0])
+            return datos
         except Exception as e:
             print(f'error {e}')
             #return HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR , detail="Internal Server Error")
