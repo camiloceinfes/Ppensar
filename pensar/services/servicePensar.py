@@ -271,19 +271,14 @@ class Ppensar():
         
     def detail_test(self, db):
     
-        #procedure_name = "BD_MARTESDEPRUEBA.dbo.SPR_Pensar_DetallePrueba"
+        procedure_name = "BD_MARTESDEPRUEBA.dbo.SPR_Pensar_DetallePrueba"
         try:
-            #query = text(f"EXEC {procedure_name} ")
-            #result = db.execute(query, {}).fetchall()
+            query = text(f"EXEC {procedure_name} ")
+            result = db.execute(query, {}).fetchall()
 
-            dir_actual = os.path.dirname(__file__)
-            ruta_json = os.path.join(dir_actual, 'prueba.json')
-
-            with open(ruta_json, encoding='utf-8') as f:
-                datos = json.load(f)
-
-            #print(datos)#return list(result[0])
-            return datos
+            ejemplo = json.loads(result[0][0])
+            return ejemplo["data"]        
+        
         except Exception as e:
             print(f'error {e}')
             #return HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR , detail="Internal Server Error")
