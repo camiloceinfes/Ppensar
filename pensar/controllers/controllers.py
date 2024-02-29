@@ -89,6 +89,7 @@ async def competencies(codigoColegio: int, anio: int,
 
 @router_pensar.get("/area", dependencies=[Depends(JwtBearer())])
 async def area(codigoColegio: int, anio: int, 
+               idComponente: Union[int, None] = None, 
                idPrueba: Union[int, None] = None, 
                idArea: Union[int, None] = None, 
                grado: Union[int, None] = None, 
@@ -100,7 +101,7 @@ async def area(codigoColegio: int, anio: int,
     grado    = grado or -1
     salon    = salon or -1
 
-    _area = Ppensar().calculate_area(codigoColegio, anio, idPrueba, idArea, grado, salon, db)
+    _area = Ppensar().calculate_area(codigoColegio, anio, idComponente, idPrueba, idArea, grado, salon, db)
     if not _area:
         return HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Area not found")
     return _area
@@ -112,6 +113,7 @@ async def area(codigoColegio: int, anio: int,
             500: {"description": "Internal Server Error"}
         })
 async def grado(codigoColegio: int, anio: int,
+               idComponente: Union[int, None] = None,
                idPrueba: Union[int, None] = None, 
                idArea: Union[int, None] = None, 
                grado: Union[int, None] = None, 
@@ -123,7 +125,7 @@ async def grado(codigoColegio: int, anio: int,
     grado    = grado or -1
     salon    = salon or -1
     
-    _grado = Ppensar().calculate_grado(codigoColegio, anio, idPrueba, idArea, grado, salon, db)
+    _grado = Ppensar().calculate_grado(codigoColegio, anio, idComponente, idPrueba, idArea, grado, salon, db)
     if not _grado:
         return HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Grade not found")
     return _grado
@@ -138,9 +140,13 @@ async def student(codigoColegio: int, anio: int,
     return _student
 
 @router_pensar.get("/detail", dependencies=[Depends(JwtBearer())])
-async def detail(db: Session = Depends(get_db)):
-    _detail = Ppensar().detail_test(db)
+async def detail(codigoColegio: int, anio: int,
+                 grado: int, idPrueba: int,
+                 idArea: Union[int, None] = None,
+                 db: Session = Depends(get_db)):
+    
+    idArea = idArea or 0
+    _detail = Ppensar().detail_test(codigoColegio, anio, grado, idArea, idPrueba, db)
     # if not _student:
     #     return HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Grade not found")
     return _detail
-    

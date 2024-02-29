@@ -60,7 +60,7 @@ class Ppensar():
             #return HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR , detail="Internal Server Error")
             return []
     
-    def calculate_area(self, codigoColegio: int, anio: int, idPurba: int, idArea: int, grado: int, salon: int, db: Session): 
+    def calculate_area(self, codigoColegio: int, anio: int, idComponente: int, idPurba: int, idArea: int, grado: int, salon: int, db: Session): 
 
         procedure_name = "BD_MARTESDEPRUEBA.dbo.SPR_Pensar_Desempeno"
 
@@ -126,7 +126,7 @@ class Ppensar():
             #return HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR , detail="Internal Server Error")
             return []
 
-    def calculate_grado(self, codigoColegio: int, anio: int, idPurba: int, idArea: int, grado: int, salon: int, db: Session): 
+    def calculate_grado(self, codigoColegio: int, anio: int, idComponente: int, idPurba: int, idArea: int, grado: int, salon: int, db: Session): 
 
         procedure_name = "BD_MARTESDEPRUEBA.dbo.SPR_Pensar_Desempeno"
 
@@ -269,12 +269,12 @@ class Ppensar():
             #return HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR , detail="Internal Server Error")
             return []
         
-    def detail_test(self, db):
+    def detail_test(self, codigoColegio, anio, grado, idArea, idPrueba, db):
     
         procedure_name = "BD_MARTESDEPRUEBA.dbo.SPR_Pensar_DetallePrueba"
         try:
-            query = text(f"EXEC {procedure_name} ")
-            result = db.execute(query, {}).fetchall()
+            query = text(f"EXEC {procedure_name} @Codigo=:Codigo, @Anno=:Anno, @IDPrueba=:IDPrueba, @Grado=:Grado, @IDArea=:IDArea")
+            result = db.execute(query, {"Codigo": codigoColegio, "Anno": anio, "IDPrueba": idPrueba, "Grado":grado, "IDArea": idArea}).fetchall()
 
             ejemplo = json.loads(result[0][0])
             return ejemplo["data"]        
@@ -283,3 +283,10 @@ class Ppensar():
             print(f'error {e}')
             #return HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR , detail="Internal Server Error")
             return []
+        
+
+    # @Codigo INT = 6340,
+    # @Anno INT = 2023,
+    # @Grado INT = 9,
+    # @IDPrueba INT = 10,
+    # @IDArea INT = 0
