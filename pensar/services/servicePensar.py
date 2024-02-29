@@ -30,7 +30,7 @@ class Ppensar():
         
         try:
             query = text(f"EXEC {procedure_name} @CODIGO=:Codigo, @ANNOA=:Anno, @IDPRUEBA=:IDPrueba, @CICLO_GRADO=:CicloGrado")
-            result = db.execute(query, {"Codigo": code, "Anno": year, "IDPrueba": idTest or -1, "CicloGrado": -2  }).fetchall()
+            result = db.execute(query, {"Codigo": code, "Anno": year, "IDPrueba": idTest or -1, "CicloGrado": -3  }).fetchall()
 
             tests = []
             
@@ -44,7 +44,6 @@ class Ppensar():
                     "id": row[0],
                     "name": row[1],
                     "img": row[2],
-                    "cycle": row[3],
                     "globalScore": row[5],
                     "resultsTotal": row[6],
                     "date": formatted_date or None,
