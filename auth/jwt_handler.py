@@ -7,7 +7,7 @@ import os
 load_dotenv(".env")
 
 JWT_SECRET = os.environ.get("SECRET_KEY")
-JWT_ALGORITHM = os.environ.get("SECRET_KEY")
+JWT_ALGORITHM = os.environ.get("ALGORITHM")
 
 # Function returns the generated Tokens (JWTs)
 def token_response(token:str):
@@ -25,9 +25,6 @@ def signJWT(userId:str):
     return token_response(token)
 
 def decodeJWT(token:str):
-    try:
-        decode_token = jwt.decode(token, JWT_SECRET, algorithm=JWT_ALGORITHM)
-        return decode_token if decode_token['expires'] >= time.time() else None
-    except:
-        return {}
+    decode_token = jwt.decode(token, JWT_SECRET, algorithms=[JWT_ALGORITHM])
+    return decode_token if decode_token['exp'] >= time.time() else None
     

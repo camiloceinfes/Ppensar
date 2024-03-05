@@ -1,3 +1,4 @@
+from auth.role import RoleChecker
 from fastapi import APIRouter, Depends, HTTPException, status
 from config.db import SessionLocal
 from pensar.services.servicePensar import Ppensar
@@ -16,7 +17,7 @@ def get_db():
         db.close()
 
 # protected_route (authorization header)
-@router_pensar.get("/global-params", dependencies=[Depends(JwtBearer())], status_code=status.HTTP_200_OK, responses={
+@router_pensar.get("/global-params", dependencies=[Depends(JwtBearer()), Depends(RoleChecker(allowed_roles=["DIR_INS"]))], status_code=status.HTTP_200_OK, responses={
     200: {"description": "Successful Response"},
     404: {"description": "Resource not found"},
     500: {"description": "Internal Server Error"}
@@ -28,16 +29,18 @@ async def global_params(code: int, year: int, db: Session = Depends(get_db)):
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Resource not found")
     return global_params
 
-@router_pensar.get("/tests", dependencies=[Depends(JwtBearer())], status_code=status.HTTP_200_OK, responses={
-    200: {"description": "Successful Response"},
-    404: {"description": "Resource not found"},
-    500: {"description": "Internal Server Error"}
+@router_pensar.get("/tests",
+                   dependencies=[Depends(JwtBearer()), Depends(RoleChecker(allowed_roles=["DIR_INS"]))], 
+                   responses={   
+                    200: {"description": "Successful Response"},
+                    404: {"description": "Resource not found"},
+                    500: {"description": "Internal Server Error"}
 } )
 async def tests(code: int, year: int, idTest:int = None, db: Session = Depends(get_db)):
     test = Ppensar().get_tests(code, year, idTest, db)
     return test
 
-@router_pensar.get("/tasks", dependencies=[Depends(JwtBearer())], status_code=status.HTTP_200_OK, responses={
+@router_pensar.get("/tasks", dependencies=[Depends(JwtBearer()), Depends(RoleChecker(allowed_roles=["DIR_INS"]))], status_code=status.HTTP_200_OK, responses={
     200: {"description": "Successful Response"},
     404: {"description": "Tasks not found"},
     500: {"description": "Internal Server Error"}
@@ -46,7 +49,7 @@ async def task(code: int, year: int,  idGrade: int = None, idClassroom: int = No
     tasks = Ppensar().get_tasks(code, year, idGrade, idClassroom, idPrueba, idArea, db)
     return tasks
 
-@router_pensar.get("/results", dependencies=[Depends(JwtBearer())], status_code=status.HTTP_200_OK, responses={
+@router_pensar.get("/results", dependencies=[Depends(JwtBearer()), Depends(RoleChecker(allowed_roles=["DIR_INS"]))], status_code=status.HTTP_200_OK, responses={
     200: {"description": "Successful Response"},
     404: {"description": "Results not found"},
     500: {"description": "Internal Server Error"}
@@ -55,7 +58,7 @@ async def results(code: int, year: int, idPrueba:int = None, db: Session = Depen
     results = Ppensar().global_results(code, year, idPrueba, db)
     return results
 
-@router_pensar.get("/cycle/results", dependencies=[Depends(JwtBearer())], status_code=status.HTTP_200_OK, responses={
+@router_pensar.get("/cycle/results", dependencies=[Depends(JwtBearer()), Depends(RoleChecker(allowed_roles=["DIR_INS"]))], status_code=status.HTTP_200_OK, responses={
     200: {"description": "Successful Response"},
     404: {"description": "Results not found"},
     500: {"description": "Internal Server Error"}
@@ -64,7 +67,7 @@ async def cycle_results(code: int, year: int, idPrueba:int = None, db: Session =
     cycle_results = Ppensar().cycle_results(code, year, idPrueba, db)
     return cycle_results
 
-@router_pensar.get("/components", dependencies=[Depends(JwtBearer())], status_code=status.HTTP_200_OK, responses={
+@router_pensar.get("/components", dependencies=[Depends(JwtBearer()), Depends(RoleChecker(allowed_roles=["DIR_INS"]))], status_code=status.HTTP_200_OK, responses={
             200: {"description": "Successful Response"},
             404: {"description": "Tasks not found"},
             500: {"description": "Internal Server Error"}
@@ -87,7 +90,7 @@ async def components(codigoColegio: int, anio: int,
     return _componentes
 
 
-@router_pensar.get("/competencies", dependencies=[Depends(JwtBearer())], status_code=status.HTTP_200_OK, responses={
+@router_pensar.get("/competencies", dependencies=[Depends(JwtBearer()), Depends(RoleChecker(allowed_roles=["DIR_INS"]))], status_code=status.HTTP_200_OK, responses={
             200: {"description": "Successful Response"},
             404: {"description": "Tasks not found"},
             500: {"description": "Internal Server Error"}
@@ -109,7 +112,7 @@ async def competencies(codigoColegio: int, anio: int,
     #     return HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Competencie not found")
     return _competencia
 
-@router_pensar.get("/area", dependencies=[Depends(JwtBearer())])
+@router_pensar.get("/area", dependencies=[Depends(JwtBearer()), Depends(RoleChecker(allowed_roles=["DIR_INS"]))])
 async def area(codigoColegio: int, anio: int, 
                idComponente: Union[int, None] = None, 
                idPrueba: Union[int, None] = None, 
@@ -129,7 +132,7 @@ async def area(codigoColegio: int, anio: int,
     return _area
 
 
-@router_pensar.get("/grado", dependencies=[Depends(JwtBearer())], status_code=status.HTTP_200_OK, responses={
+@router_pensar.get("/grado", dependencies=[Depends(JwtBearer()), Depends(RoleChecker(allowed_roles=["DIR_INS"]))], status_code=status.HTTP_200_OK, responses={
             200: {"description": "Successful Response"},
             404: {"description": "Grade not found"},
             500: {"description": "Internal Server Error"}
@@ -152,7 +155,7 @@ async def grado(codigoColegio: int, anio: int,
         return HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Grade not found")
     return _grado
 
-@router_pensar.get("/students", dependencies=[Depends(JwtBearer())])
+@router_pensar.get("/students", dependencies=[Depends(JwtBearer()), Depends(RoleChecker(allowed_roles=["DIR_INS"]))])
 async def student(codigoColegio: int, anio: int,
                idPrueba: Union[int, None] = None,  
                db: Session = Depends(get_db)):
@@ -161,7 +164,7 @@ async def student(codigoColegio: int, anio: int,
     
     return _student
 
-@router_pensar.get("/students/tasks", dependencies=[Depends(JwtBearer())], status_code=status.HTTP_200_OK, responses={
+@router_pensar.get("/students/tasks", dependencies=[Depends(JwtBearer()), Depends(RoleChecker(allowed_roles=["DIR_INS"]))], status_code=status.HTTP_200_OK, responses={
     200: {"description": "Successful Response"},
     404: {"description": "Resource not found"},
     500: {"description": "Internal Server Error"}
@@ -170,7 +173,7 @@ async def tasks_students(code: int, year: int, idGrade: int, idArea: int, taskNa
     tasks_students = Ppensar().students_tasks(code, year, idGrade, classroom, idPrueba, idArea, taskName, db)
     return tasks_students
 
-@router_pensar.get("/detail", dependencies=[Depends(JwtBearer())])
+@router_pensar.get("/detail", dependencies=[Depends(JwtBearer()), Depends(RoleChecker(allowed_roles=["DIR_INS"]))])
 async def detail(codigoColegio: int, anio: int,
                  grado: int, idPrueba: int,
                  idArea: Union[int, None] = None,
