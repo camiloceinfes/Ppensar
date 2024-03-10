@@ -68,6 +68,8 @@ class Ppensar():
             query = text(f"EXEC {procedure_name} @CODIGO=:CODIGO, @ANNOA=:ANNOA, @IDPRUEBA=:IDPRUEBA, @IDAREA=:IDAREA, @GRADO=:GRADO, @SALON=:SALON")
             result = db.execute(query, {"CODIGO": codigoColegio, "ANNOA": anio, "IDPRUEBA": idPurba, "IDAREA": idArea, "GRADO": grado, "SALON": salon}).fetchall()
             
+            print(result)
+            
             df = pl.DataFrame(result)
             new_df = pl.DataFrame(
             {
