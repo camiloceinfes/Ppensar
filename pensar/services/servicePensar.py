@@ -197,7 +197,7 @@ class Ppensar():
     
         return ''
     
-    def calculate_prueba_estudiantes(self, codigoColegio, anio, idPrueba, db):
+    def calculate_prueba_estudiantes(self, codigoColegio, anio, idPrueba, grado, db):
     
         procedure_name = "BD_MARTESDEPRUEBA.dbo.SPR_Pensar_ListNotas"
         try:
@@ -205,66 +205,182 @@ class Ppensar():
             query = text(f"EXEC {procedure_name} @Codigo=:Codigo, @ANNOA=:ANNOA, @IDPRUEBA=:IDPRUEBA")
             result = db.execute(query, {"Codigo": codigoColegio, "ANNOA": anio, "IDPRUEBA": idPrueba}).fetchall()
             
-            print(result)
-            #return json.loads(result[0][0])
-            df = pl.DataFrame(result)
-            #df_pandas = df.to_pandas()
-            
-            data = {
-                'Puesto': df['column_0'].apply(lambda x: x[0]),
-                'IdPrueba': df['column_0'].apply(lambda x: x[1]),
-                'Nombre Prueba': df['column_0'].apply(lambda x: x[2]),
-                'IdResultado': df['column_0'].apply(lambda x: x[3]),
-                'Grado': df['column_0'].apply(lambda x: x[4]),
-                'Salon': df['column_0'].apply(lambda x: x[5]),
-                'Estudiante': df['column_0'].apply(lambda x: x[6]),
-                'Nombres y Apellidos': df['column_0'].apply(lambda x: x[7]),
-                'Genérico': df['column_0'].apply(lambda x: x[8]),
-                'No Genérico': df['column_0'].apply(lambda x: x[9]),
-                'Biología': df['column_0'].apply(lambda x: x[10]),
-                'Química': df['column_0'].apply(lambda x: x[11]),
-                'Física': df['column_0'].apply(lambda x: x[12]),
-                'C.T.S': df['column_0'].apply(lambda x: x[13]),
-                'Sociales': df['column_0'].apply(lambda x: x[14]),
-                'Ciudadanas': df['column_0'].apply(lambda x: x[15]),
-                'Lenguaje': df['column_0'].apply(lambda x: x[16]),
-                'Inglés': df['column_0'].apply(lambda x: x[17]),
-                'Definitiva': df['column_0'].apply(lambda x: x[18]),
-                'Global': df['column_0'].apply(lambda x: x[19])
-            }
-            new_df = pd.DataFrame(data)
-            new_df = new_df.fillna(0)
-            new_df = new_df.to_dict(orient='records')
+            if grado > 9:
+                print('Grado > 9')
+                df = pl.DataFrame(result)
 
-            lista = []
-
-            for elemento in new_df:
-            
-                dicc = {
-                        "id": elemento['Puesto'],
-                        "grado": elemento['Grado'],
-                        "lista": elemento['Estudiante'],
-                        "nombre": elemento['Nombres y Apellidos'],
-                        "puesto": elemento['Puesto'],
-                        "genericos": elemento['Genérico'],
-                        "numGenericos": elemento['No Genérico'],
-                        "biologia": elemento['Biología'],
-                        "quimica": elemento['Química'],
-                        "fisica": elemento['Física'],
-                        "cts": elemento['C.T.S'],
-                        "sociales": elemento['Sociales'],
-                        "ciudadanas": elemento['Ciudadanas'],
-                        "lenguaje": elemento['Lenguaje'],
-                        "ingles": elemento['Inglés'],
-                        "definitiva": elemento['Definitiva'],
-                        "global": elemento['Global'],
-                        "empty": ""
-                    }
-            
-                lista.append(dicc)
+                columns = [
+                    { 'headerName': 'Grado', 'field': 'grado', 
+                    },
+                    { 'headerName': 'Lista', 'field': 'lista', 
+                    },
+                    { 'headerName': 'Nombres y apellidos', 'field': 'nombre', 
+                    },
+                    { 'headerName': 'Puesto', 'field': 'puesto', 
+                    },
+                    { 'headerName': 'Genéricos', 'field': 'genericos', 
+                    },
+                    { 'headerName': 'N. Genéricos', 'field': 'numGenericos', 
+                    },
+                    { 'headerName': 'Biología', 'field': 'biologia', 
+                    },
+                    { 'headerName': 'Química', 'field': 'quimica', 
+                    },
+                    { 'headerName': 'Física', 'field': 'fisica', 
+                    },
+                    { 'headerName': 'C.T.S', 'field': 'cts', 
+                    },
+                    { 'headerName': 'Sociales', 'field': 'sociales', 
+                    },
+                    { 'headerName': 'Ciudadanas', 'field': 'ciudadanas', 
+                    },
+                    { 'headerName': 'Lenguaje', 'field': 'lenguaje', 
+                    },
+                    { 'headerName': 'Inglés', 'field': 'ingles', 
+                    },
+                    { 'headerName': 'Definitiva', 'field': 'definitiva', 
+                    },
+                    { 'headerName': 'Global', 'field': 'global', 
+                    },
+                    { 'headerName': '', 'field': 'empty', 
+                    },
+                ]
                 
-            #print(lista)
-            return lista
+                data = {
+                    'Puesto': df['column_0'].apply(lambda x: x[0]),
+                    'IdPrueba': df['column_0'].apply(lambda x: x[1]),
+                    'Nombre Prueba': df['column_0'].apply(lambda x: x[2]),
+                    'IdResultado': df['column_0'].apply(lambda x: x[3]),
+                    'Grado': df['column_0'].apply(lambda x: x[4]),
+                    'Salon': df['column_0'].apply(lambda x: x[5]),
+                    'Estudiante': df['column_0'].apply(lambda x: x[6]),
+                    'Nombres y Apellidos': df['column_0'].apply(lambda x: x[7]),
+                    'Genérico': df['column_0'].apply(lambda x: x[8]),
+                    'No Genérico': df['column_0'].apply(lambda x: x[9]),
+                    'Biología': df['column_0'].apply(lambda x: x[10]),
+                    'Química': df['column_0'].apply(lambda x: x[11]),
+                    'Física': df['column_0'].apply(lambda x: x[12]),
+                    'C.T.S': df['column_0'].apply(lambda x: x[13]),
+                    'Sociales': df['column_0'].apply(lambda x: x[14]),
+                    'Ciudadanas': df['column_0'].apply(lambda x: x[15]),
+                    'Lenguaje': df['column_0'].apply(lambda x: x[16]),
+                    'Inglés': df['column_0'].apply(lambda x: x[17]),
+                    'Definitiva': df['column_0'].apply(lambda x: x[18]),
+                    'Global': df['column_0'].apply(lambda x: x[19])
+                }
+                new_df = pd.DataFrame(data)
+                new_df = new_df.fillna(0)
+                new_df = new_df.to_dict(orient='records')
+
+                lista = []
+
+                for elemento in new_df:
+                
+                    dicc = {
+                            "id": elemento['Puesto'],
+                            "grado": elemento['Grado'],
+                            "lista": elemento['Estudiante'],
+                            "nombre": elemento['Nombres y Apellidos'],
+                            "puesto": elemento['Puesto'],
+                            "genericos": elemento['Genérico'],
+                            "numGenericos": elemento['No Genérico'],
+                            "biologia": elemento['Biología'],
+                            "quimica": elemento['Química'],
+                            "fisica": elemento['Física'],
+                            "cts": elemento['C.T.S'],
+                            "sociales": elemento['Sociales'],
+                            "ciudadanas": elemento['Ciudadanas'],
+                            "lenguaje": elemento['Lenguaje'],
+                            "ingles": elemento['Inglés'],
+                            "definitiva": elemento['Definitiva'],
+                            "global": elemento['Global'],
+                            "empty": ""
+                        }
+                
+                    lista.append(dicc)
+
+                    #print(lista)
+                return {'columns': columns, 'rows': lista}
+            
+            else:
+                df = pl.DataFrame(result)
+                #df_pandas = df.to_pandas()
+                print('Grado < 9')
+
+                columns = [
+                    { 'headerName': 'Grado', 'field': 'grado', 
+                    },
+                    { 'headerName': 'Lista', 'field': 'lista', 
+                    },
+                    { 'headerName': 'Nombres y apellidos', 'field': 'nombre', 
+                    },
+                    { 'headerName': 'Puesto', 'field': 'puesto', 
+                    },
+                    { 'headerName': 'Genéricos', 'field': 'genericos', 
+                    },
+                    { 'headerName': 'Biología', 'field': 'biologia', 
+                    },
+                    { 'headerName': 'Sociales', 'field': 'sociales', 
+                    },
+                    { 'headerName': 'Ciudadanas', 'field': 'ciudadanas', 
+                    },
+                    { 'headerName': 'Lenguaje', 'field': 'lenguaje', 
+                    },
+                    { 'headerName': 'Inglés', 'field': 'ingles', 
+                    },
+                    { 'headerName': 'Definitiva', 'field': 'definitiva', 
+                    },
+                    { 'headerName': 'Global', 'field': 'global', 
+                    },
+                    { 'headerName': '', 'field': 'empty', 
+                    },
+                ]
+                
+                data = {
+                    'Puesto': df['column_0'].apply(lambda x: x[0]),
+                    'IdPrueba': df['column_0'].apply(lambda x: x[1]),
+                    'Nombre Prueba': df['column_0'].apply(lambda x: x[2]),
+                    'IdResultado': df['column_0'].apply(lambda x: x[3]),
+                    'Grado': df['column_0'].apply(lambda x: x[4]),
+                    'Salon': df['column_0'].apply(lambda x: x[5]),
+                    'Estudiante': df['column_0'].apply(lambda x: x[6]),
+                    'Nombres y Apellidos': df['column_0'].apply(lambda x: x[7]),
+                    'Genérico': df['column_0'].apply(lambda x: x[8]),
+                    'Biología': df['column_0'].apply(lambda x: x[9]),
+                    'Sociales': df['column_0'].apply(lambda x: x[10]),
+                    'Ciudadanas': df['column_0'].apply(lambda x: x[11]),
+                    'Lenguaje': df['column_0'].apply(lambda x: x[12]),
+                    'Inglés': df['column_0'].apply(lambda x: x[13]),
+                    'Definitiva': df['column_0'].apply(lambda x: x[14]),
+                    'Global': df['column_0'].apply(lambda x: x[15])
+                }
+                new_df = pd.DataFrame(data)
+                new_df = new_df.fillna(0)
+                new_df = new_df.to_dict(orient='records')
+
+                lista = []
+
+                for elemento in new_df:
+                
+                    dicc = {
+                            "id": elemento['Puesto'],
+                            "grado": elemento['Grado'],
+                            "lista": elemento['Estudiante'],
+                            "nombre": elemento['Nombres y Apellidos'],
+                            "puesto": elemento['Puesto'],
+                            "genericos": elemento['Genérico'],
+                            "biologia": elemento['Biología'],
+                            "sociales": elemento['Sociales'],
+                            "ciudadanas": elemento['Ciudadanas'],
+                            "lenguaje": elemento['Lenguaje'],
+                            "ingles": elemento['Inglés'],
+                            "definitiva": elemento['Definitiva'],
+                            "global": elemento['Global'],
+                            "empty": ""
+                        }
+                    
+                    lista.append(dicc)
+                return {'columns': columns, 'rows': lista}           
 
         except Exception as e:
             print(f'error {e}')
