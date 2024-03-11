@@ -157,11 +157,12 @@ async def grado(codigoColegio: int, anio: int,
 
 @router_pensar.get("/students", dependencies=[Depends(JwtBearer()), Depends(RoleChecker(allowed_roles=["DIR_INS"]))])
 async def student(codigoColegio: int, anio: int,
-               idPrueba: Union[int, None] = None,  
+               idPrueba: Union[int, None] = None, 
+               grado: Union[int, None] = None, 
                db: Session = Depends(get_db)):
-    idPrueba = idPrueba or -1
-    _student = Ppensar().calculate_prueba_estudiantes(codigoColegio, anio, idPrueba, db)
-    
+    _student = Ppensar().calculate_prueba_estudiantes(codigoColegio, anio, idPrueba, grado, db)
+    # if not _student:
+    #     return HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Grade not found")
     return _student
 
 @router_pensar.get("/students/tasks", dependencies=[Depends(JwtBearer()), Depends(RoleChecker(allowed_roles=["DIR_INS"]))], status_code=status.HTTP_200_OK, responses={
