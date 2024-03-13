@@ -283,6 +283,8 @@ class Ppensar():
             query = text(f"EXEC {procedure_name} @CODIGO=:CODIGO, @ANNOA=:ANNOA, @IDPRUEBA=:IDPRUEBA, @IDAREA=:IDAREA, @GRADO=:GRADO, @SALON=:SALON")
             result = db.execute(query, {"CODIGO": codigoColegio, "ANNOA": anio, "IDPRUEBA": idPurba, "IDAREA": idArea, "GRADO": grado, "SALON": salon}).fetchall()
             
+            print(result)
+
             if len(result) != 0:
                 df = pl.DataFrame(result)
                 new_df = pl.DataFrame(
@@ -357,7 +359,7 @@ class Ppensar():
 
             query = text(f"EXEC {procedure_name} @CODIGO=:CODIGO, @ANNOA=:ANNOA, @IDPRUEBA=:IDPRUEBA, @GRADO=:GRADO, @SALON=:SALON")
             result = db.execute(query, {"CODIGO": codigoColegio, "ANNOA": anio, "IDPRUEBA": idPrueba, "GRADO": grado, "SALON": salon}).fetchall()
-            
+
             if len(result) != 0:    
                 if grado > 9:
                     print('Grado > 9')
@@ -572,3 +574,58 @@ class Ppensar():
             print(f'error {e}')
             #return HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR , detail="Internal Server Error")
             return []
+
+    def performance(self, codigoColegio, anio, grado, salon, idPrueba, db):
+    
+        procedure_name = "BD_MARTESDEPRUEBA.dbo.SPR_Pensar_NivelDesempeno"
+        try:
+            query = text(f"EXEC {procedure_name} @CODIGO=:CODIGO, @ANNOA=:ANNOA, @IDPRUEBA=:IDPRUEBA, @GRADO=:GRADO, @SALON=:SALON")
+            result = db.execute(query, {"CODIGO": codigoColegio, "ANNOA": anio, "IDPRUEBA": idPrueba, "GRADO":grado, "SALON": salon}).fetchall()
+  
+            if len(result) != 0: 
+                df = pl.DataFrame(result)
+                new_df = pl.DataFrame(
+                        {
+                            'Orden': df['column_0'].apply(lambda x: x[0]),
+                            'Area': df['column_0'].apply(lambda x: x[1]),
+                            'Bajo': df['column_0'].apply(lambda x: x[2]),
+                            'Basico': df['column_0'].apply(lambda x: x[3]),
+                            'Alto': df['column_0'].apply(lambda x: x[4]),
+                            'Superior': df['column_0'].apply(lambda x: x[5])
+                        }
+                    )
+
+                labels = new_df['Area'].to_list()
+                datasets = []
+                for label in ['Bajo', 'Basico', 'Alto', 'Superior']:
+                    data = new_df[label].to_list()
+
+                    if label == 'Bajo':
+                        backgroundColor = "#DC3D3D"
+                    elif label == 'Basico':
+                        backgroundColor = "#E27E1E"
+                    elif label == 'Alto':
+                        backgroundColor = "rgba(241, 204, 48, 1)"
+                    elif label == 'Superior':
+                        backgroundColor = "#92B93B"
+
+                    datasets.append({
+                        "label": label,
+                        "data": data,
+                        "backgroundColor": backgroundColor,
+                        "stack": "Stack 0"
+                    })
+
+                json_data = {
+                    "labels": labels,
+                    "datasets": datasets
+                }
+    
+                return json_data
+            
+            else:
+                return []
+        
+        except Exception as e:
+            print(f'error {e}')
+            raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR , detail="Internal Server Error")

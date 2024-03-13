@@ -132,7 +132,7 @@ async def area(codigoColegio: int, anio: int,
 
     _area = Ppensar().calculate_area(codigoColegio, anio, idComponente, idPrueba, idArea, grado, salon, db)
     if not _area:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Area not found")
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Data not found")
     return _area
 
 @router_pensar.get("/grado", dependencies=[Depends(JwtBearer()), Depends(RoleChecker(allowed_roles=["DIR_INS"]))], responses={   
@@ -155,7 +155,7 @@ async def grado(codigoColegio: int, anio: int,
     
     _grado = Ppensar().calculate_grado(codigoColegio, anio, idComponente, idPrueba, idArea, grado, salon, db)
     if not _grado:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Grade not found")
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Data not found")
     return _grado
 
 @router_pensar.get("/students", dependencies=[Depends(JwtBearer()), Depends(RoleChecker(allowed_roles=["DIR_INS"]))], responses={   
@@ -167,9 +167,14 @@ async def student(codigoColegio: int, anio: int, grado: int,
                 salon: Union[int, None] = None,
                 idPrueba: Union[int, None] = None, 
                 db: Session = Depends(get_db)):
+    
+    grado = idPrueba or -1
+    idPrueba = idPrueba or -1
+    salon    = salon or -1
+
     _student = Ppensar().calculate_prueba_estudiantes(codigoColegio, anio, idPrueba, grado, salon, db)
     if not _student:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Student list not found")
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Data not found")
     return _student
 
 @router_pensar.get("/students/tasks", dependencies=[Depends(JwtBearer()), Depends(RoleChecker(allowed_roles=["DIR_INS"]))], status_code=status.HTTP_200_OK, responses={
@@ -192,3 +197,23 @@ async def detail(codigoColegio: int, anio: int,
     # if not _student:
     #     return HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Grade not found")
     return _detail
+
+@router_pensar.get("/level-performance", dependencies=[Depends(JwtBearer()), Depends(RoleChecker(allowed_roles=["DIR_INS"]))],responses={   
+                    200: {"description": "Successful Response"},
+                    404: {"description": "Resource not found"},
+                    500: {"description": "Internal Server Error"}
+                })
+async def level_performance(codigoColegio: int, 
+                            anio: int, 
+                            grado: int,
+                salon: Union[int, None] = None,
+                idPrueba: Union[int, None] = None, 
+                db: Session = Depends(get_db)):
+    
+    grado = idPrueba or -1
+    idPrueba = idPrueba or -1
+    salon    = salon or -1
+    _performance = Ppensar().performance(codigoColegio, anio, grado, salon, idPrueba, db)
+    if not _performance:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Data not found")
+    return _performance
