@@ -169,9 +169,10 @@ class Ppensar():
         procedure_name = "BD_MARTESDEPRUEBA.dbo.SPR_Pensar_PuntajeGlobalPorComponente"
         try:
             query = text(f"EXEC {procedure_name} @Codigo=:Codigo, @ANNO=:ANNO, @Grado=:Grado, @Salon=:Salon, @IDArea=:IDArea, @IDComponente=:IDComponente")
-            result = db.execute(query, {"Codigo": codigoColegio, "ANNO": anio, "Grado": grado, "Salon": salon, "IDArea": idArea, "IDComponente": idComponente}).fetchall()
-            #print(result)
-            return json.loads(result[0][0])
+            result = db.execute(query, {"Codigo": codigoColegio, "ANNO": anio, "Grado": grado or 0, "Salon": salon or 0, "IDArea": idArea or 0, "IDComponente": idComponente or 0}).fetchall()
+            
+            if len(result) != 0:
+                return json.loads(result[0][0])
         
         except Exception as e:
             print(f'error {e}')
@@ -179,12 +180,12 @@ class Ppensar():
             return []
     
     def calculate_competencias(self, codigoColegio, anio, grado, salon, idCompetencia, idArea, db):
-    
+
         procedure_name = "BD_MARTESDEPRUEBA.dbo.SPR_Pensar_PuntajeGlobalPorCompetencia"
         try:
 
             query = text(f"EXEC {procedure_name} @Codigo=:Codigo, @ANNO=:ANNO, @Grado=:Grado, @Salon=:Salon, @IDArea=:IDArea, @IDCompetencia=:IDCompetencia")
-            result = db.execute(query, {"Codigo": codigoColegio, "ANNO": anio, "Grado": grado, "Salon": salon, "IDArea": idArea, "IDCompetencia": idCompetencia}).fetchall()
+            result = db.execute(query, {"Codigo": codigoColegio, "ANNO": anio, "Grado": grado or 0, "Salon": salon or 0, "IDArea": idArea or 0, "IDCompetencia": idCompetencia or 0}).fetchall()
             
             return json.loads(result[0][0])
 
@@ -199,7 +200,7 @@ class Ppensar():
 
         try:
             query = text(f"EXEC {procedure_name} @CODIGO=:CODIGO, @ANNOA=:ANNOA, @IDPRUEBA=:IDPRUEBA, @IDAREA=:IDAREA, @GRADO=:GRADO, @SALON=:SALON")
-            result = db.execute(query, {"CODIGO": codigoColegio, "ANNOA": anio, "IDPRUEBA": idPurba, "IDAREA": idArea, "GRADO": grado, "SALON": salon}).fetchall()
+            result = db.execute(query, {"CODIGO": codigoColegio, "ANNOA": anio, "IDPRUEBA": idPurba or -1, "IDAREA": idArea or -1, "GRADO": grado or -1, "SALON": salon or -1}).fetchall()
         
             #print(result)
             if len(result) != 0:
@@ -281,9 +282,7 @@ class Ppensar():
 
         try:
             query = text(f"EXEC {procedure_name} @CODIGO=:CODIGO, @ANNOA=:ANNOA, @IDPRUEBA=:IDPRUEBA, @IDAREA=:IDAREA, @GRADO=:GRADO, @SALON=:SALON")
-            result = db.execute(query, {"CODIGO": codigoColegio, "ANNOA": anio, "IDPRUEBA": idPurba, "IDAREA": idArea, "GRADO": grado, "SALON": salon}).fetchall()
-            
-            print(result)
+            result = db.execute(query, {"CODIGO": codigoColegio, "ANNOA": anio, "IDPRUEBA": idPurba or -1, "IDAREA": idArea or -1, "GRADO": grado or -1, "SALON": salon or -1}).fetchall()
 
             if len(result) != 0:
                 df = pl.DataFrame(result)
@@ -354,11 +353,13 @@ class Ppensar():
     
     def calculate_prueba_estudiantes(self, codigoColegio, anio, idPrueba, grado, salon, db):
     
+        #print(f'codigo: {codigoColegio}, año: {anio}, idprueba: {idPrueba}, grado: {grado}, salon: {salon}')
+
         procedure_name = "BD_MARTESDEPRUEBA.dbo.SPR_Pensar_ListNotas" #[dbo].[SPR_Pensar_ListNotas]
         try:
 
             query = text(f"EXEC {procedure_name} @CODIGO=:CODIGO, @ANNOA=:ANNOA, @IDPRUEBA=:IDPRUEBA, @GRADO=:GRADO, @SALON=:SALON")
-            result = db.execute(query, {"CODIGO": codigoColegio, "ANNOA": anio, "IDPRUEBA": idPrueba, "GRADO": grado, "SALON": salon}).fetchall()
+            result = db.execute(query, {"CODIGO": codigoColegio, "ANNOA": anio, "IDPRUEBA": idPrueba or -1, "GRADO": grado or -1, "SALON": salon or -1}).fetchall()
 
             if len(result) != 0:    
                 if grado > 9:
@@ -580,8 +581,8 @@ class Ppensar():
         procedure_name = "BD_MARTESDEPRUEBA.dbo.SPR_Pensar_NivelDesempeno"
         try:
             query = text(f"EXEC {procedure_name} @CODIGO=:CODIGO, @ANNOA=:ANNOA, @IDPRUEBA=:IDPRUEBA, @GRADO=:GRADO, @SALON=:SALON")
-            result = db.execute(query, {"CODIGO": codigoColegio, "ANNOA": anio, "IDPRUEBA": idPrueba, "GRADO":grado, "SALON": salon}).fetchall()
-  
+            result = db.execute(query, {"CODIGO": codigoColegio, "ANNOA": anio, "IDPRUEBA": idPrueba or -1, "GRADO":grado or -1, "SALON": salon or -1}).fetchall()
+
             if len(result) != 0: 
                 df = pl.DataFrame(result)
                 new_df = pl.DataFrame(

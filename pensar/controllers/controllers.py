@@ -74,16 +74,11 @@ async def cycle_results(code: int, year: int, idPrueba:int = None, db: Session =
         })
 async def components(codigoColegio: int, anio: int, 
                     grado: Union[int, None] = None, 
-                    salon: Union[str, None] = None, 
+                    salon: Union[int, None] = None, 
                     idComponente: Union[int, None] = None, 
                     idArea: Union[int, None] = None, 
                     db: Session = Depends(get_db)):
     
-    grado = grado or 0    
-    salon = salon or 0
-    idComponente = idComponente or 0
-    idArea = idArea or 0
-
     _componentes = Ppensar().calculate_componentes(codigoColegio, anio, grado, salon, idComponente, idArea, db)
     # if not _competencia:
     #     return HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Competencie not found")
@@ -102,11 +97,6 @@ async def competencies(codigoColegio: int, anio: int,
                     idArea: Union[int, None] = None, 
                     db: Session = Depends(get_db)):
     
-    grado = grado or 0 
-    salon = salon or 0
-    idCompetencia = idCompetencia or 0
-    idArea = idArea or 0
-
     _competencia = Ppensar().calculate_competencias(codigoColegio, anio, grado, salon, idCompetencia, idArea, db)
     # if not _competencia:
     #     return HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Competencie not found")
@@ -125,11 +115,6 @@ async def area(codigoColegio: int, anio: int,
                salon: Union[int, None] = None, 
                db: Session = Depends(get_db)):
     
-    idPrueba = idPrueba or -1
-    idArea   = idArea or -1
-    grado    = grado or -1
-    salon    = salon or -1
-
     _area = Ppensar().calculate_area(codigoColegio, anio, idComponente, idPrueba, idArea, grado, salon, db)
     if not _area:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Data not found")
@@ -147,12 +132,7 @@ async def grado(codigoColegio: int, anio: int,
                grado: Union[int, None] = None, 
                salon: Union[int, None] = None, 
                db: Session = Depends(get_db)):
-    
-    idPrueba = idPrueba or -1
-    idArea   = idArea or -1
-    grado    = grado or -1
-    salon    = salon or -1
-    
+        
     _grado = Ppensar().calculate_grado(codigoColegio, anio, idComponente, idPrueba, idArea, grado, salon, db)
     if not _grado:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Data not found")
@@ -168,10 +148,6 @@ async def student(codigoColegio: int, anio: int, grado: int,
                 idPrueba: Union[int, None] = None, 
                 db: Session = Depends(get_db)):
     
-    grado = idPrueba or -1
-    idPrueba = idPrueba or -1
-    salon    = salon or -1
-
     _student = Ppensar().calculate_prueba_estudiantes(codigoColegio, anio, idPrueba, grado, salon, db)
     if not _student:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Data not found")
@@ -210,9 +186,6 @@ async def level_performance(codigoColegio: int,
                 idPrueba: Union[int, None] = None, 
                 db: Session = Depends(get_db)):
     
-    grado = idPrueba or -1
-    idPrueba = idPrueba or -1
-    salon    = salon or -1
     _performance = Ppensar().performance(codigoColegio, anio, grado, salon, idPrueba, db)
     if not _performance:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Data not found")
