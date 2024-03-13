@@ -181,10 +181,10 @@ async def detail(codigoColegio: int, anio: int,
                 })
 async def level_performance(codigoColegio: int, 
                             anio: int, 
-                            grado: int,
-                salon: Union[int, None] = None,
-                idPrueba: Union[int, None] = None, 
-                db: Session = Depends(get_db)):
+                            idPrueba: int, 
+                            salon: Union[int, None] = None,
+                            grado: Union[int, None] = None,
+                            db: Session = Depends(get_db)):
     
     _performance = Ppensar().performance(codigoColegio, anio, grado, salon, idPrueba, db)
     if not _performance:

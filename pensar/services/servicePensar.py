@@ -581,7 +581,7 @@ class Ppensar():
         procedure_name = "BD_MARTESDEPRUEBA.dbo.SPR_Pensar_NivelDesempeno"
         try:
             query = text(f"EXEC {procedure_name} @CODIGO=:CODIGO, @ANNOA=:ANNOA, @IDPRUEBA=:IDPRUEBA, @GRADO=:GRADO, @SALON=:SALON")
-            result = db.execute(query, {"CODIGO": codigoColegio, "ANNOA": anio, "IDPRUEBA": idPrueba or -1, "GRADO":grado or -1, "SALON": salon or -1}).fetchall()
+            result = db.execute(query, {"CODIGO": codigoColegio, "ANNOA": anio, "IDPRUEBA": idPrueba, "GRADO":grado or -1, "SALON": salon or -1}).fetchall()
 
             if len(result) != 0: 
                 df = pl.DataFrame(result)
