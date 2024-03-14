@@ -258,12 +258,12 @@ class Ppensar():
                                 {
                                 "label": "Ciclo anterior",
                                 "data": avrs_list_ciclo_anterior,
-                                "backgroundColor": "rgba(88, 41, 112, 0.7)"
+                                "backgroundColor": "#7E859A"
                                 },
                                 {
                                 "label": "Grado actual",
                                 "data": avrs_list_grado_actual,
-                                "backgroundColor": "rgba(88, 41, 112, 0.6)"
+                                "backgroundColor": "#2c3f59"
                                 }
                             ]
                         }
@@ -329,12 +329,12 @@ class Ppensar():
                                 {
                                 "label": "Ciclo anterior",
                                 "data": avrs_list_ciclo_anterior,
-                                "backgroundColor": "rgba(88, 41, 112, 0.7)"
+                                "backgroundColor": "#7E859A"
                                 },
                                 {
                                 "label": "Grado actual",
                                 "data": avrs_list_grado_actual,
-                                "backgroundColor": "rgba(88, 41, 112, 0.6)"
+                                "backgroundColor": "#2c3f59"
                                 }
                             ]
                         }
