@@ -541,13 +541,13 @@ class Ppensar():
             print(f'error {e}')
             raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR , detail="Internal Server Error")
         
-    def students_tasks(self, code, year, idGrade, classroom, idTest, idArea, taskName, db):
+    def students_tasks(self, code, year, grade, classroom, idTest, idArea, taskName, db):
         procedure_name = "BD_MARTESDEPRUEBA.dbo.SPR_Pensar_EstudiantePorAprendizaje"
         
         try:
             query = text(f"EXEC {procedure_name} @Codigo=:Codigo, @Anno=:Anno, @Grado=:Grado, @Salon=:Salon, @IDPrueba=:IDPrueba,@IDArea=:IDArea, @Tarea=:Tarea")
 
-            students_tasks = db.execute(query, {"Codigo": code, "Anno": year, "Grado": idGrade, "Tarea": taskName, "Salon": classroom or 0, "IDPrueba": idTest or 0, "IDArea": idArea or 0  }).fetchall()
+            students_tasks = db.execute(query, {"Codigo": code, "Anno": year, "Grado": grade, "Tarea": taskName, "Salon": classroom or 0, "IDPrueba": idTest or 0, "IDArea": idArea or 0  }).fetchall()
 
             if students_tasks and students_tasks[0][0] is not None:
                 return json.loads(students_tasks[0][0])

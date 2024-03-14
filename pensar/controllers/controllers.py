@@ -156,8 +156,8 @@ async def student(code: int, year: int, grade: int,
     404: {"description": "Resource not found"},
     500: {"description": "Internal Server Error"}
 })
-async def tasks_students(code: int, year: int, idGrade: int, idArea: int, taskName: str, classroom: int = None, idTest: int = None, db: Session = Depends(get_db)):
-    tasks_students = Ppensar().students_tasks(code, year, idGrade, classroom, idTest, idArea, taskName, db)
+async def tasks_students(code: int, year: int, grade: int, idArea: int, taskName: str, classroom: int = None, idTest: int = None, db: Session = Depends(get_db)):
+    tasks_students = Ppensar().students_tasks(code, year, grade, classroom, idTest, idArea, taskName, db)
     return tasks_students
 
 @router_pensar.get("/detail", dependencies=[Depends(JwtBearer()), Depends(RoleChecker(allowed_roles=["DIR_INS"]))])
