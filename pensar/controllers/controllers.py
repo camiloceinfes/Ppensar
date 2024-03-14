@@ -45,8 +45,8 @@ async def tests(code: int, year: int, idTest:int = None, db: Session = Depends(g
     404: {"description": "Tasks not found"},
     500: {"description": "Internal Server Error"}
 })
-async def task(code: int, year: int,  idGrade: int = None, idClassroom: int = None, idPrueba: int = None, idArea: int = None, db: Session = Depends(get_db)):
-    tasks = Ppensar().get_tasks(code, year, idGrade, idClassroom, idPrueba, idArea, db)
+async def task(code: int, year: int,  idGrade: int = None, idClassroom: int = None, idTest: int = None, idArea: int = None, db: Session = Depends(get_db)):
+    tasks = Ppensar().get_tasks(code, year, idGrade, idClassroom, idTest, idArea, db)
     return tasks
 
 @router_pensar.get("/results", dependencies=[Depends(JwtBearer()), Depends(RoleChecker(allowed_roles=["DIR_INS"]))], status_code=status.HTTP_200_OK, responses={
@@ -54,8 +54,8 @@ async def task(code: int, year: int,  idGrade: int = None, idClassroom: int = No
     404: {"description": "Results not found"},
     500: {"description": "Internal Server Error"}
 })
-async def results(code: int, year: int, idPrueba:int = None, db: Session = Depends(get_db)):
-    results = Ppensar().global_results(code, year, idPrueba, db)
+async def results(code: int, year: int, idTest:int = None, db: Session = Depends(get_db)):
+    results = Ppensar().global_results(code, year, idTest, db)
     return results
 
 @router_pensar.get("/cycle/results", dependencies=[Depends(JwtBearer()), Depends(RoleChecker(allowed_roles=["DIR_INS"]))], status_code=status.HTTP_200_OK, responses={
@@ -63,8 +63,8 @@ async def results(code: int, year: int, idPrueba:int = None, db: Session = Depen
     404: {"description": "Results not found"},
     500: {"description": "Internal Server Error"}
 })
-async def cycle_results(code: int, year: int, idPrueba:int = None, db: Session = Depends(get_db)):
-    cycle_results = Ppensar().cycle_results(code, year, idPrueba, db)
+async def cycle_results(code: int, year: int, idTest:int = None, db: Session = Depends(get_db)):
+    cycle_results = Ppensar().cycle_results(code, year, idTest, db)
     return cycle_results
 
 @router_pensar.get("/components", dependencies=[Depends(JwtBearer()), Depends(RoleChecker(allowed_roles=["DIR_INS"]))], status_code=status.HTTP_200_OK, responses={
@@ -72,14 +72,14 @@ async def cycle_results(code: int, year: int, idPrueba:int = None, db: Session =
             404: {"description": "Tasks not found"},
             500: {"description": "Internal Server Error"}
         })
-async def components(codigoColegio: int, anio: int, 
-                    grado: Union[int, None] = None, 
-                    salon: Union[int, None] = None, 
-                    idComponente: Union[int, None] = None, 
+async def components(code: int, year: int, 
+                    grade: Union[int, None] = None, 
+                    classroom: Union[int, None] = None, 
+                    idComponent: Union[int, None] = None, 
                     idArea: Union[int, None] = None, 
                     db: Session = Depends(get_db)):
     
-    _componentes = Ppensar().calculate_componentes(codigoColegio, anio, grado, salon, idComponente, idArea, db)
+    _componentes = Ppensar().components_calculate(code, year, grade, classroom, idComponent, idArea, db)
     # if not _competencia:
     #     return HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Competencie not found")
     return _componentes
@@ -90,14 +90,14 @@ async def components(codigoColegio: int, anio: int,
                     404: {"description": "Resource not found"},
                     500: {"description": "Internal Server Error"}
                 })
-async def competencies(codigoColegio: int, anio: int, 
-                    grado: Union[int, None] = None, 
-                    salon: Union[str, None] = None, 
-                    idCompetencia: Union[int, None] = None, 
+async def competences(code: int, year: int, 
+                    grade: Union[int, None] = None, 
+                    classroom: Union[str, None] = None, 
+                    idCompetence: Union[int, None] = None, 
                     idArea: Union[int, None] = None, 
                     db: Session = Depends(get_db)):
     
-    _competencia = Ppensar().calculate_competencias(codigoColegio, anio, grado, salon, idCompetencia, idArea, db)
+    _competencia = Ppensar().competences_calculate(code, year, grade, classroom, idCompetence, idArea, db)
     # if not _competencia:
     #     return HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Competencie not found")
     return _competencia
@@ -107,15 +107,14 @@ async def competencies(codigoColegio: int, anio: int,
                     404: {"description": "Resource not found"},
                     500: {"description": "Internal Server Error"}
                 })
-async def area(codigoColegio: int, anio: int, 
-               idComponente: Union[int, None] = None, 
-               idPrueba: Union[int, None] = None, 
+async def area(code: int, year: int,
+               idTest: Union[int, None] = None, 
                idArea: Union[int, None] = None, 
-               grado: Union[int, None] = None, 
-               salon: Union[int, None] = None, 
+               grade: Union[int, None] = None, 
+               classroom: Union[int, None] = None, 
                db: Session = Depends(get_db)):
     
-    _area = Ppensar().calculate_area(codigoColegio, anio, idComponente, idPrueba, idArea, grado, salon, db)
+    _area = Ppensar().area_calculate(code, year, idTest, idArea, grade, classroom, db)
     if not _area:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Data not found")
     return _area
@@ -125,15 +124,14 @@ async def area(codigoColegio: int, anio: int,
                     404: {"description": "Resource not found"},
                     500: {"description": "Internal Server Error"}
                 })
-async def grado(codigoColegio: int, anio: int,
-               idComponente: Union[int, None] = None,
-               idPrueba: Union[int, None] = None, 
+async def grade(code: int, year: int,
+               idTest: Union[int, None] = None, 
                idArea: Union[int, None] = None, 
-               grado: Union[int, None] = None, 
-               salon: Union[int, None] = None, 
+               grade: Union[int, None] = None, 
+               classroom: Union[int, None] = None, 
                db: Session = Depends(get_db)):
         
-    _grado = Ppensar().calculate_grado(codigoColegio, anio, idComponente, idPrueba, idArea, grado, salon, db)
+    _grado = Ppensar().grade_calculate(code, year, idTest, idArea, grade, classroom, db)
     if not _grado:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Data not found")
     return _grado
@@ -143,12 +141,12 @@ async def grado(codigoColegio: int, anio: int,
                     404: {"description": "Resource not found"},
                     500: {"description": "Internal Server Error"}
                 })
-async def student(codigoColegio: int, anio: int, grado: int,
-                salon: Union[int, None] = None,
-                idPrueba: Union[int, None] = None, 
+async def student(code: int, year: int, grade: int,
+                classroom: Union[int, None] = None,
+                idTest: Union[int, None] = None, 
                 db: Session = Depends(get_db)):
     
-    _student = Ppensar().calculate_prueba_estudiantes(codigoColegio, anio, idPrueba, grado, salon, db)
+    _student = Ppensar().students_test_calculate(code, year, idTest, grade, classroom, db)
     if not _student:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Data not found")
     return _student
@@ -158,18 +156,18 @@ async def student(codigoColegio: int, anio: int, grado: int,
     404: {"description": "Resource not found"},
     500: {"description": "Internal Server Error"}
 })
-async def tasks_students(code: int, year: int, idGrade: int, idArea: int, taskName: str, classroom: int = None, idPrueba: int = None, db: Session = Depends(get_db)):
-    tasks_students = Ppensar().students_tasks(code, year, idGrade, classroom, idPrueba, idArea, taskName, db)
+async def tasks_students(code: int, year: int, idGrade: int, idArea: int, taskName: str, classroom: int = None, idTest: int = None, db: Session = Depends(get_db)):
+    tasks_students = Ppensar().students_tasks(code, year, idGrade, classroom, idTest, idArea, taskName, db)
     return tasks_students
 
 @router_pensar.get("/detail", dependencies=[Depends(JwtBearer()), Depends(RoleChecker(allowed_roles=["DIR_INS"]))])
-async def detail(codigoColegio: int, anio: int,
-                 grado: int, idPrueba: int,
+async def detail(code: int, year: int,
+                 grade: int, idTest: int,
                  idArea: Union[int, None] = None,
                  db: Session = Depends(get_db)):
     
     idArea = idArea or 0
-    _detail = Ppensar().detail_test(codigoColegio, anio, grado, idArea, idPrueba, db)
+    _detail = Ppensar().detail_test(code, year, grade, idArea, idTest, db)
     # if not _student:
     #     return HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Grade not found")
     return _detail
@@ -179,14 +177,14 @@ async def detail(codigoColegio: int, anio: int,
                     404: {"description": "Resource not found"},
                     500: {"description": "Internal Server Error"}
                 })
-async def level_performance(codigoColegio: int, 
-                            anio: int, 
-                            idPrueba: int, 
-                            salon: Union[int, None] = None,
-                            grado: Union[int, None] = None,
+async def level_performance(code: int, 
+                            year: int, 
+                            idTest: int, 
+                            classroom: Union[int, None] = None,
+                            grade: Union[int, None] = None,
                             db: Session = Depends(get_db)):
     
-    _performance = Ppensar().performance(codigoColegio, anio, grado, salon, idPrueba, db)
+    _performance = Ppensar().performance(code, year, grade, classroom, idTest, db)
     if not _performance:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Data not found")
     return _performance

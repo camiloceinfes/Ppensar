@@ -57,13 +57,13 @@ class Ppensar():
             raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Internal Server Error")
         
 
-    def get_tasks(self,code, year, idGrade, idClassroom, idPrueba, idArea, db):
+    def get_tasks(self,code, year, idGrade, idClassroom, idTest, idArea, db):
         procedure_name = "BD_MARTESDEPRUEBA.dbo.SPR_Pensar_PuntajeGlobalPorAprendizaje"
         
         try:
             query = text(f"EXEC {procedure_name} @Codigo=:Codigo, @Anno=:Anno, @Grado=:Grado, @Salon=:Salon, @IDPrueba=:IDPrueba,@IDArea=:IDArea")
 
-            tasks = db.execute(query, {"Codigo": code, "Anno": year, "Grado": idGrade or 0, "Salon": idClassroom or 0, "IDPrueba": idPrueba or 0, "IDArea": idArea or 0 }).fetchall()
+            tasks = db.execute(query, {"Codigo": code, "Anno": year, "Grado": idGrade or 0, "Salon": idClassroom or 0, "IDPrueba": idTest or 0, "IDArea": idArea or 0 }).fetchall()
 
             if tasks and tasks[0][0] is not None:
                 return json.loads(tasks[0][0])
@@ -73,12 +73,12 @@ class Ppensar():
             print(f'error {e}')
             raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR , detail="Internal Server Error")
         
-    def global_results(self, code, year, idPrueba, db):
+    def global_results(self, code, year, idTest, db):
         procedure_name = "BD_MARTESDEPRUEBA.dbo.SPR_Pensar_GlobalDesempeno"
         
         try:
             query = text(f"EXEC {procedure_name} @CODIGO=:Codigo, @ANNOA=:Anno, @IDPRUEBA=:IDPrueba")
-            result = db.execute(query, {"Codigo": code, "Anno": year, "IDPrueba": idPrueba or -2 }).fetchall()
+            result = db.execute(query, {"Codigo": code, "Anno": year, "IDPrueba": idTest or -2 }).fetchall()
             
             performance = []
             
@@ -101,15 +101,15 @@ class Ppensar():
             print(f'error {e}')
             raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Internal Server Error")
 
-    def cycle_results(self, code, year, idPrueba, db):
+    def cycle_results(self, code, year, idTest, db):
         procedure_name = "BD_MARTESDEPRUEBA.dbo.SPR_Pensar_GradoCicloDesempeno"
     
         try:
             query = text(f"EXEC {procedure_name} @CODIGO=:Codigo, @ANNOA=:Anno, @IDPRUEBA=:IDPrueba, @CICLO_GRADO=:CicloGrado")
-            result = db.execute(query, {"Codigo": code, "Anno": year, "IDPrueba": idPrueba or -2, "CicloGrado": -1}).fetchall()
+            result = db.execute(query, {"Codigo": code, "Anno": year, "IDPrueba": idTest or -2, "CicloGrado": -1}).fetchall()
 
             performance = {}
-            global_score_by_cycle = self.calculate_weighted_average(code, year, idPrueba, db)
+            global_score_by_cycle = self.calculate_weighted_average(code, year, idTest, db)
             
             # Initialize percentage dictionary
             percentage_dict = {item['cycle']: item['score'] for item in global_score_by_cycle}
@@ -164,12 +164,12 @@ class Ppensar():
             print(f'error {e}')
             raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Internal Server Error")
 
-    def calculate_componentes(self, codigoColegio, anio, grado, salon, idComponente, idArea, db):
+    def components_calculate(self, code, year, grade, classroom, idComponent, idArea, db):
         
         procedure_name = "BD_MARTESDEPRUEBA.dbo.SPR_Pensar_PuntajeGlobalPorComponente"
         try:
             query = text(f"EXEC {procedure_name} @Codigo=:Codigo, @ANNO=:ANNO, @Grado=:Grado, @Salon=:Salon, @IDArea=:IDArea, @IDComponente=:IDComponente")
-            result = db.execute(query, {"Codigo": codigoColegio, "ANNO": anio, "Grado": grado or 0, "Salon": salon or 0, "IDArea": idArea or 0, "IDComponente": idComponente or 0}).fetchall()
+            result = db.execute(query, {"Codigo": code, "ANNO": year, "Grado": grade or 0, "Salon": classroom or 0, "IDArea": idArea or 0, "IDComponente": idComponent or 0}).fetchall()
             
             if len(result) != 0:
                 return json.loads(result[0][0])
@@ -179,13 +179,13 @@ class Ppensar():
             #return HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR , detail="Internal Server Error")
             return []
     
-    def calculate_competencias(self, codigoColegio, anio, grado, salon, idCompetencia, idArea, db):
+    def competences_calculate(self, code, year, grade, classroom, idCompetence, idArea, db):
 
         procedure_name = "BD_MARTESDEPRUEBA.dbo.SPR_Pensar_PuntajeGlobalPorCompetencia"
         try:
 
             query = text(f"EXEC {procedure_name} @Codigo=:Codigo, @ANNO=:ANNO, @Grado=:Grado, @Salon=:Salon, @IDArea=:IDArea, @IDCompetencia=:IDCompetencia")
-            result = db.execute(query, {"Codigo": codigoColegio, "ANNO": anio, "Grado": grado or 0, "Salon": salon or 0, "IDArea": idArea or 0, "IDCompetencia": idCompetencia or 0}).fetchall()
+            result = db.execute(query, {"Codigo": code, "ANNO": year, "Grado": grade or 0, "Salon": classroom or 0, "IDArea": idArea or 0, "IDCompetencia": idCompetence or 0}).fetchall()
             
             return json.loads(result[0][0])
 
@@ -194,13 +194,13 @@ class Ppensar():
             #return HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR , detail="Internal Server Error")
             return []
     
-    def calculate_area(self, codigoColegio: int, anio: int, idComponente: int, idPurba: int, idArea: int, grado: int, salon: int, db: Session): 
+    def area_calculate(self, code: int, year: int, idTest: int, idArea: int, grade: int, classroom: int, db: Session): 
 
         procedure_name = "BD_MARTESDEPRUEBA.dbo.SPR_Pensar_Desempeno"
 
         try:
             query = text(f"EXEC {procedure_name} @CODIGO=:CODIGO, @ANNOA=:ANNOA, @IDPRUEBA=:IDPRUEBA, @IDAREA=:IDAREA, @GRADO=:GRADO, @SALON=:SALON")
-            result = db.execute(query, {"CODIGO": codigoColegio, "ANNOA": anio, "IDPRUEBA": idPurba or -1, "IDAREA": idArea or -1, "GRADO": grado or -1, "SALON": salon or -1}).fetchall()
+            result = db.execute(query, {"CODIGO": code, "ANNOA": year, "IDPRUEBA": idTest or -1, "IDAREA": idArea or -1, "GRADO": grade or -1, "SALON": classroom or -1}).fetchall()
         
             #print(result)
             if len(result) != 0:
@@ -276,13 +276,13 @@ class Ppensar():
             #return HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR , detail="Internal Server Error")
             raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Internal Server Error")
 
-    def calculate_grado(self, codigoColegio: int, anio: int, idComponente: int, idPurba: int, idArea: int, grado: int, salon: int, db: Session): 
+    def grade_calculate(self, code: int, year: int, idTest: int, idArea: int, grade: int, classroom: int, db: Session): 
 
         procedure_name = "BD_MARTESDEPRUEBA.dbo.SPR_Pensar_Desempeno"
 
         try:
             query = text(f"EXEC {procedure_name} @CODIGO=:CODIGO, @ANNOA=:ANNOA, @IDPRUEBA=:IDPRUEBA, @IDAREA=:IDAREA, @GRADO=:GRADO, @SALON=:SALON")
-            result = db.execute(query, {"CODIGO": codigoColegio, "ANNOA": anio, "IDPRUEBA": idPurba or -1, "IDAREA": idArea or -1, "GRADO": grado or -1, "SALON": salon or -1}).fetchall()
+            result = db.execute(query, {"CODIGO": code, "ANNOA": year, "IDPRUEBA": idTest or -1, "IDAREA": idArea or -1, "GRADO": grade or -1, "SALON": classroom or -1}).fetchall()
 
             if len(result) != 0:
                 df = pl.DataFrame(result)
@@ -347,11 +347,7 @@ class Ppensar():
             print(f'error {e}')
             raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Internal Server Error")
 
-    def parameters(self, codigoColegio, anio, db):
-    
-        return ''
-    
-    def calculate_prueba_estudiantes(self, codigoColegio, anio, idPrueba, grado, salon, db):
+    def students_test_calculate(self, code, year, idTest, grade, classroom, db):
     
         #print(f'codigo: {codigoColegio}, año: {anio}, idprueba: {idPrueba}, grado: {grado}, salon: {salon}')
 
@@ -359,10 +355,10 @@ class Ppensar():
         try:
 
             query = text(f"EXEC {procedure_name} @CODIGO=:CODIGO, @ANNOA=:ANNOA, @IDPRUEBA=:IDPRUEBA, @GRADO=:GRADO, @SALON=:SALON")
-            result = db.execute(query, {"CODIGO": codigoColegio, "ANNOA": anio, "IDPRUEBA": idPrueba or -1, "GRADO": grado or -1, "SALON": salon or -1}).fetchall()
+            result = db.execute(query, {"CODIGO": code, "ANNOA": year, "IDPRUEBA": idTest or -1, "GRADO": grade or -1, "SALON": classroom or -1}).fetchall()
 
             if len(result) != 0:    
-                if grado > 9:
+                if grade > 9:
                     print('Grado > 9')
                     df = pl.DataFrame(result)
 
@@ -545,13 +541,13 @@ class Ppensar():
             print(f'error {e}')
             raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR , detail="Internal Server Error")
         
-    def students_tasks(self, code, year, idGrade, classroom, idPrueba, idArea, taskName, db):
+    def students_tasks(self, code, year, idGrade, classroom, idTest, idArea, taskName, db):
         procedure_name = "BD_MARTESDEPRUEBA.dbo.SPR_Pensar_EstudiantePorAprendizaje"
         
         try:
             query = text(f"EXEC {procedure_name} @Codigo=:Codigo, @Anno=:Anno, @Grado=:Grado, @Salon=:Salon, @IDPrueba=:IDPrueba,@IDArea=:IDArea, @Tarea=:Tarea")
 
-            students_tasks = db.execute(query, {"Codigo": code, "Anno": year, "Grado": idGrade, "Tarea": taskName, "Salon": classroom or 0, "IDPrueba": idPrueba or 0, "IDArea": idArea or 0  }).fetchall()
+            students_tasks = db.execute(query, {"Codigo": code, "Anno": year, "Grado": idGrade, "Tarea": taskName, "Salon": classroom or 0, "IDPrueba": idTest or 0, "IDArea": idArea or 0  }).fetchall()
 
             if students_tasks and students_tasks[0][0] is not None:
                 return json.loads(students_tasks[0][0])
@@ -561,12 +557,12 @@ class Ppensar():
             print(f'error {e}')
             raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR , detail="Internal Server Error")
         
-    def detail_test(self, codigoColegio, anio, grado, idArea, idPrueba, db):
+    def detail_test(self, code, year, grade, idArea, idTest, db):
     
         procedure_name = "BD_MARTESDEPRUEBA.dbo.SPR_Pensar_DetallePrueba"
         try:
             query = text(f"EXEC {procedure_name} @Codigo=:Codigo, @Anno=:Anno, @IDPrueba=:IDPrueba, @Grado=:Grado, @IDArea=:IDArea")
-            result = db.execute(query, {"Codigo": codigoColegio, "Anno": anio, "IDPrueba": idPrueba, "Grado":grado, "IDArea": idArea}).fetchall()
+            result = db.execute(query, {"Codigo": code, "Anno": year, "IDPrueba": idTest, "Grado":grade, "IDArea": idArea}).fetchall()
 
             ejemplo = json.loads(result[0][0])
             return ejemplo["data"]        
@@ -576,12 +572,12 @@ class Ppensar():
             #return HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR , detail="Internal Server Error")
             return []
 
-    def performance(self, codigoColegio, anio, grado, salon, idPrueba, db):
+    def performance(self, code, year, grade, classroom, idTest, db):
     
         procedure_name = "BD_MARTESDEPRUEBA.dbo.SPR_Pensar_NivelDesempeno"
         try:
             query = text(f"EXEC {procedure_name} @CODIGO=:CODIGO, @ANNOA=:ANNOA, @IDPRUEBA=:IDPRUEBA, @GRADO=:GRADO, @SALON=:SALON")
-            result = db.execute(query, {"CODIGO": codigoColegio, "ANNOA": anio, "IDPRUEBA": idPrueba, "GRADO":grado or -1, "SALON": salon or -1}).fetchall()
+            result = db.execute(query, {"CODIGO": code, "ANNOA": year, "IDPRUEBA": idTest, "GRADO": grade or -1, "SALON": classroom or -1}).fetchall()
 
             if len(result) != 0: 
                 df = pl.DataFrame(result)
