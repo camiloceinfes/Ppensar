@@ -258,7 +258,7 @@ class Ppensar():
                                 {
                                 "label": "Ciclo anterior",
                                 "data": avrs_list_ciclo_anterior,
-                                "backgroundColor": "#7E859A"
+                                "backgroundColor": "#ACB2C4"
                                 },
                                 {
                                 "label": "Grado actual",
@@ -329,7 +329,7 @@ class Ppensar():
                                 {
                                 "label": "Ciclo anterior",
                                 "data": avrs_list_ciclo_anterior,
-                                "backgroundColor": "#7E859A"
+                                "backgroundColor": "#ACB2C4"
                                 },
                                 {
                                 "label": "Grado actual",
