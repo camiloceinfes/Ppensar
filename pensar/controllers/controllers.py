@@ -45,8 +45,8 @@ async def tests(code: int, year: int, idTest:int = None, db: Session = Depends(g
     404: {"description": "Tasks not found"},
     500: {"description": "Internal Server Error"}
 })
-async def task(code: int, year: int,  idGrade: int = None, idClassroom: int = None, idTest: int = None, idArea: int = None, db: Session = Depends(get_db)):
-    tasks = Ppensar().get_tasks(code, year, idGrade, idClassroom, idTest, idArea, db)
+async def task(code: int, year: int,  idGrade: int = None, classroom: int = None, idTest: int = None, idArea: int = None, db: Session = Depends(get_db)):
+    tasks = Ppensar().get_tasks(code, year, idGrade, classroom, idTest, idArea, db)
     return tasks
 
 @router_pensar.get("/results", dependencies=[Depends(JwtBearer()), Depends(RoleChecker(allowed_roles=["DIR_INS"]))], status_code=status.HTTP_200_OK, responses={
