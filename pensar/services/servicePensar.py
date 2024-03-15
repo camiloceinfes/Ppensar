@@ -244,29 +244,49 @@ class Ppensar():
                     avrs_list_grado_actual.append(np.round(np.mean(grado_actual_dict[i]), 0))
                     avrs_list_ciclo_anterior.append(np.round(np.mean(ciclo_anterior_dict[i]), 0))
 
+                for i in avrs_list_ciclo_anterior:
+                    condicional_ciclo_anterior = np.mean(i)
+                
                 asignaturas_list = []
                 for key in sorted(asignaturas_dict.keys()):
                     for asignatura in asignaturas_dict[key]:
                         if asignatura not in asignaturas_list:
-                            asignaturas_list.append(asignatura)              
+                            asignaturas_list.append(asignatura)
 
-                json_areas = {
-                            "title": "Desempeño por área",
-                            "label": "Promedio",
-                            "labels": asignaturas_list,
-                            "datasets": [
-                                {
-                                "label": "Ciclo anterior",
-                                "data": avrs_list_ciclo_anterior,
-                                "backgroundColor": "#ACB2C4"
-                                },
-                                {
-                                "label": "Grado actual",
-                                "data": avrs_list_grado_actual,
-                                "backgroundColor": "#2c3f59"
-                                }
-                            ]
-                        }
+                if condicional_ciclo_anterior > 0:
+
+                    json_areas = {
+                        "title": "Desempeño por área",
+                        "label": "Promedio",
+                        "labels": asignaturas_list,
+                        "datasets": [
+                            {
+                            "label": "Ciclo anterior",
+                            "data": avrs_list_ciclo_anterior,
+                            "backgroundColor": "#ACB2C4"
+                            },
+                            {
+                            "label": "Grado actual",
+                            "data": avrs_list_grado_actual,
+                            "backgroundColor": "#2c3f59"
+                            }
+                        ]
+                    }
+                
+                else:
+                    json_areas = {
+                        "title": "Desempeño por área",
+                        "label": "Promedio",
+                        "labels": asignaturas_list,
+                        "datasets": [
+                            {
+                            "label": "Grado actual",
+                            "data": avrs_list_grado_actual,
+                            "backgroundColor": "#2c3f59"
+                            }
+                        ]
+                    }
+
                 
                 return json_areas
             else:
@@ -320,25 +340,44 @@ class Ppensar():
                 for i in sorted_keys:
                     avrs_list_grado_actual.append(np.round(np.mean(grado_actual_dict[i]), 0))
                     avrs_list_ciclo_anterior.append(np.round(np.mean(ciclo_anterior_dict[i]), 0))
+
+                for i in avrs_list_ciclo_anterior:
+                    condicional_ciclo_anterior = np.mean(i)
                 
-                json_areas = {
-                            "title": "Desempeño por grado",
-                            "label": "Promedio",
-                            "labels": sorted_keys,
-                            "datasets": [
-                                {
-                                "label": "Ciclo anterior",
-                                "data": avrs_list_ciclo_anterior,
-                                "backgroundColor": "#ACB2C4"
-                                },
-                                {
-                                "label": "Grado actual",
-                                "data": avrs_list_grado_actual,
-                                "backgroundColor": "#2c3f59"
-                                }
-                            ]
-                        }
+                if condicional_ciclo_anterior > 0:
                 
+                    json_areas = {
+                        "title": "Desempeño por grado",
+                        "label": "Promedio",
+                        "labels": sorted_keys,
+                        "datasets": [
+                            {
+                            "label": "Ciclo anterior",
+                            "data": avrs_list_ciclo_anterior,
+                            "backgroundColor": "#ACB2C4"
+                            },
+                            {
+                            "label": "Grado actual",
+                            "data": avrs_list_grado_actual,
+                            "backgroundColor": "#2c3f59"
+                            }
+                        ]
+                    }
+                
+                else:
+                    json_areas = {
+                        "title": "Desempeño por grado",
+                        "label": "Promedio",
+                        "labels": sorted_keys,
+                        "datasets": [
+                            {
+                            "label": "Grado actual",
+                            "data": avrs_list_grado_actual,
+                            "backgroundColor": "#2c3f59"
+                            }
+                        ]
+                    }
+            
                 return json_areas
             
             else: 
